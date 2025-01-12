@@ -8,6 +8,7 @@ import me.cho.snackball.domain.Authority;
 import me.cho.snackball.domain.User;
 import me.cho.snackball.repository.UserRepository;
 import me.cho.snackball.global.security.CustomUserDetails;
+import me.cho.snackball.settings.UpdatePasswordForm;
 import me.cho.snackball.settings.UpdateProfileForm;
 import me.cho.snackball.user.dto.SignupForm;
 import org.springframework.mail.SimpleMailMessage;
@@ -85,6 +86,11 @@ public class UserService {
         user.setOccupation(form.getOccupation());
         user.setCompany(form.getCompany());
         user.setUrl(form.getUrl());
+        userRepository.save(user);
+    }
+
+    public void updatePassword(User user, UpdatePasswordForm updatePasswordForm) {
+        user.setPassword(passwordEncoder.encode(updatePasswordForm.getPassword()));
         userRepository.save(user);
     }
 }
