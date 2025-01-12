@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="~{layout/fragments.html :: head}"></head>
+
+<body>
+    <div th:replace="~{layout/fragments.html :: main-nav}"></div>
+
+    <div class="container">
+        <div class="row mt-5 justify-content-center">
+            <div class="col-3">
+                <!-- 사이드 네비게이션 -->
+                <div th:replace="~{settings/layout/sideNav.html :: sideNav(currentMenu='notifications')}"></div>
+            </div>
+
+            <div class="col-7">
+                <div class="card py-4 px-5">
+                    <div class="row">
+                        <div class="card-body">
+                            <h3 class="card-title">NOTIFICATIONS</h3>
+                        </div>
+                    </div>
+
+                    <div class="row d-flex flex-md-row flex-column">
+                        <div class="card-body">
+                            <!-- 입력 폼 -->
+                            <div style="max-width: 500px;">
+                                <form th:action="@{/settings/notifications}" th:object="${updateNotificationsForm}" method="post" novalidate>
+
+                                    <div class="alert alert-light" role="alert">
+                                        <strong><a href="#" th:href="@{/settings/locations}">주요 활동 지역</a>에
+                                            <a href="#" th:href="@{/settings/keywords}">관심있는 주제</a>의 스터디가 만들어졌을 때</strong> 알림을 받을 방법을 설정하세요.
+                                    </div>
+                                    <div class="form-group mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="form-check form-switch me-4">
+                                                <input class="form-check-input" type="checkbox" role="switch" th:field="*{studyCreatedByEmail}" id="studyCreatedByEmail">
+                                                <label class="custom-control-label" for="studyCreatedByEmail">이메일로 받기</label>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" role="switch"  th:field="*{studyCreatedByWeb}" id="studyCreatedByWeb">
+                                                <label class="custom-control-label" for="studyCreatedByWeb">웹으로 받기</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-light" role="alert">
+                                        <strong>스터디 모임 참가 신청</strong> 결과 알림을 받을 방법을 설정하세요.
+                                    </div>
+                                    <div class="form-group mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="form-check form-switch me-4">
+                                                <input class="form-check-input" type="checkbox" role="switch" th:field="*{studyEnrollmentResultByEmail}" id="studyEnrollmentResultByEmil">
+                                                <label class="custom-control-label" for="studyEnrollmentResultByEmil">이메일로 받기</label>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" role="switch" th:field="*{studyEnrollmentResultByWeb}" id="studyEnrollmentResultByWeb">
+                                                <label class="custom-control-label" for="studyEnrollmentResultByWeb">웹으로 받기</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-light" role="alert">
+                                        <strong>참여중인 스터디</strong>에 대한 알림을 받을 방법을 설정하세요.
+                                    </div>
+                                    <div class="form-group mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="form-check form-switch me-4">
+                                                <input class="form-check-input" type="checkbox" role="switch" th:field="*{studyUpdatedByEmail}" id="studyWatchByEmail">
+                                                <label class="custom-control-label" for="studyWatchByEmail">이메일로 받기</label>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" role="switch" th:field="*{studyUpdatedByWeb}" id="studyWatchByWeb">
+                                                <label class="custom-control-label" for="studyWatchByWeb">웹으로 받기</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button class="btn btn-primary btn-block mt-2" type="submit">저장하기</button>
+                                    </div>
+                                </form>
+
+                                <div th:if="${message}" class="mt-3">
+                                    <span th:text="${message}">
+                                         <a th:href="@{'/profile/' + ${#authentication.principal.nickname}}">프로필로 돌아가기</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="application/javascript">
+        (function () {
+            'use strict';
+
+            window.addEventListener('load', function () {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+
+                // Loop over them and prevent submission
+                Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+            }, false)
+        }())
+    </script>
+</body>
+</html>

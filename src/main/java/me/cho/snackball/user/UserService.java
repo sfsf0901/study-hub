@@ -8,6 +8,7 @@ import me.cho.snackball.domain.Authority;
 import me.cho.snackball.domain.User;
 import me.cho.snackball.repository.UserRepository;
 import me.cho.snackball.global.security.CustomUserDetails;
+import me.cho.snackball.settings.UpdateNotificationsForm;
 import me.cho.snackball.settings.UpdatePasswordForm;
 import me.cho.snackball.settings.UpdateProfileForm;
 import me.cho.snackball.user.dto.SignupForm;
@@ -91,6 +92,16 @@ public class UserService {
 
     public void updatePassword(User user, UpdatePasswordForm updatePasswordForm) {
         user.setPassword(passwordEncoder.encode(updatePasswordForm.getPassword()));
+        userRepository.save(user);
+    }
+
+    public void updateNotifications(User user, UpdateNotificationsForm updateNotificationsForm) {
+        user.setStudyCreatedByEmail(updateNotificationsForm.isStudyCreatedByEmail());
+        user.setStudyCreatedByWeb(updateNotificationsForm.isStudyCreatedByWeb());
+        user.setStudyUpdatedByEmail(updateNotificationsForm.isStudyUpdatedByEmail());
+        user.setStudyUpdatedByWeb(updateNotificationsForm.isStudyUpdatedByWeb());
+        user.setStudyEnrollmentResultByEmail(updateNotificationsForm.isStudyEnrollmentResultByEmail());
+        user.setStudyEnrollmentResultByWeb(updateNotificationsForm.isStudyEnrollmentResultByWeb());
         userRepository.save(user);
     }
 }
