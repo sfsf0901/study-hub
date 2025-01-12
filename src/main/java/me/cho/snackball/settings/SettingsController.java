@@ -28,10 +28,16 @@ public class SettingsController {
 
     private final UserService userService;
     private final ModelMapper modelMapper;
+    private final NicknameValidator nicknameValidator;
 
     @InitBinder("updatePasswordForm")
-    public void initBinder(WebDataBinder binder) {
+    public void passwordInitBinder(WebDataBinder binder) {
         binder.addValidators(new PasswordFormValidator());
+    }
+
+    @InitBinder("updateProfileForm")
+    public void nicknameInitBinder(WebDataBinder binder) {
+        binder.addValidators(nicknameValidator);
     }
 
     @GetMapping(URL_SETTINGS_PROFILE)

@@ -38,6 +38,8 @@
                                         <label for="nickname" class="card-subtitle mb-2 text-body-secondary h6">닉네임</label>
                                         <input id="nickname" type="text" th:field="*{nickname}" class="form-control" aria-describedby="nicknameHelp" required>
                                         <small id="nicknameHelp" class="form-text text-muted">공백없이 문자와 숫자로만 3자 이상 20자 이내</small>
+                                        <small class="form-text text-danger" th:errors="*{nickname}">Email Error</small>
+
                                     </div>
 
                                     <div class="form-group mb-3">
