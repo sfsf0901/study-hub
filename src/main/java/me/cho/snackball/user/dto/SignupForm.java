@@ -19,6 +19,6 @@ public class SignupForm {
     private String nickname;
 
     @NotBlank
-    @Length(min = 8, max = 20)
+    @Length(min = 8, max = 50)
     private String password;
 }

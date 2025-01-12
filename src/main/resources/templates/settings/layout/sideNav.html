@@ -5,9 +5,9 @@
 </head>
 <body>
 <div th:fragment="sideNav(currentMenu)" class="list-group">
-    <a th:classappend="${currentMenu == 'profile'} ? 'active'" th:href="@{/settings/profile}" class="list-group-item list-group-item-action active" aria-current="true">프로필</a>
-    <a href="#" class="list-group-item list-group-item-action">A second link item</a>
-    <a href="#" class="list-group-item list-group-item-action">A third link item</a>
+    <a th:classappend="${currentMenu == 'profile'} ? 'active'" th:href="@{/settings/profile}" class="list-group-item list-group-item-action" aria-current="true">프로필</a>
+    <a th:classappend="${currentMenu == 'password'} ? 'active'" th:href="@{/settings/password}" class="list-group-item list-group-item-action" aria-current="true">비밀번호</a>
+    <a href="#" class="list-group-item list-group-item-action">알림</a>
     <a href="#" class="list-group-item list-group-item-action">A fourth link item</a>
     <a class="list-group-item list-group-item-action disabled" aria-disabled="true">A disabled link item</a>
 </div>
