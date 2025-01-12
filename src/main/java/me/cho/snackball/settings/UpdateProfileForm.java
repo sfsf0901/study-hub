@@ -29,13 +29,4 @@ public class UpdateProfileForm {
     private String description;
 
     private String profileImage;
-
-    public UpdateProfileForm(User user) {
-        this.nickname = user.getNickname();
-        this.description = user.getDescription();
-        this.occupation = user.getOccupation();
-        this.company = user.getCompany();
-        this.url = user.getUrl();
-        this.profileImage = user.getProfileImage();
-    }
 }
