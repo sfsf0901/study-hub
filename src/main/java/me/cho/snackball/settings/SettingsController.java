@@ -1,11 +1,11 @@
 package me.cho.snackball.settings;
 
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import me.cho.snackball.domain.User;
 import me.cho.snackball.user.CurrentUser;
 import me.cho.snackball.user.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +27,7 @@ public class SettingsController {
     public static final String VIEW_SETTINGS_NOTIFICATIONS = "settings/notifications";
 
     private final UserService userService;
+    private final ModelMapper modelMapper;
 
     @InitBinder("updatePasswordForm")
     public void initBinder(WebDataBinder binder) {
@@ -35,7 +36,8 @@ public class SettingsController {
 
     @GetMapping(URL_SETTINGS_PROFILE)
     public String updateProfileForm(@CurrentUser User user, Model model) {
-        model.addAttribute("updateProfileForm", new UpdateProfileForm(user));
+
+        model.addAttribute("updateProfileForm", modelMapper.map(user, UpdateProfileForm.class));
         return VIEW_SETTINGS_PROFILE;
     }
 
@@ -78,7 +80,7 @@ public class SettingsController {
 
     @GetMapping(URL_SETTINGS_NOTIFICATIONS)
     public String updateNotificationsForm(@CurrentUser User user, Model model) {
-        model.addAttribute(new UpdateNotificationsForm(user));
+        model.addAttribute(modelMapper.map(user, UpdateNotificationsForm.class));
         return VIEW_SETTINGS_NOTIFICATIONS;
     }
 

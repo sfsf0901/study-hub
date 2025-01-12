@@ -12,6 +12,7 @@ import me.cho.snackball.settings.UpdateNotificationsForm;
 import me.cho.snackball.settings.UpdatePasswordForm;
 import me.cho.snackball.settings.UpdateProfileForm;
 import me.cho.snackball.user.dto.SignupForm;
+import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +33,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
 
     public User processNewAccount(SignupForm signUpForm) {
@@ -81,12 +83,8 @@ public class UserService {
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
     }
 
-    public void updateProfile(User user, UpdateProfileForm form) {
-        user.setNickname(form.getNickname());
-        user.setDescription(form.getDescription());
-        user.setOccupation(form.getOccupation());
-        user.setCompany(form.getCompany());
-        user.setUrl(form.getUrl());
+    public void updateProfile(User user, UpdateProfileForm updateProfileForm) {
+        modelMapper.map(updateProfileForm, user);
         userRepository.save(user);
     }
 
@@ -96,12 +94,7 @@ public class UserService {
     }
 
     public void updateNotifications(User user, UpdateNotificationsForm updateNotificationsForm) {
-        user.setStudyCreatedByEmail(updateNotificationsForm.isStudyCreatedByEmail());
-        user.setStudyCreatedByWeb(updateNotificationsForm.isStudyCreatedByWeb());
-        user.setStudyUpdatedByEmail(updateNotificationsForm.isStudyUpdatedByEmail());
-        user.setStudyUpdatedByWeb(updateNotificationsForm.isStudyUpdatedByWeb());
-        user.setStudyEnrollmentResultByEmail(updateNotificationsForm.isStudyEnrollmentResultByEmail());
-        user.setStudyEnrollmentResultByWeb(updateNotificationsForm.isStudyEnrollmentResultByWeb());
+        modelMapper.map(updateNotificationsForm, user);
         userRepository.save(user);
     }
 }
