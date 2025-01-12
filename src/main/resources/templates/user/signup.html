@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments.html :: head}"></head>
+
+<body>
+  <div th:replace="~{layout/fragments.html :: main-nav}"></div>
+
+  <div class="container">
+    <!--타이틀-->
+    <div class="py-5 text-center">
+      <h2>계정 만들기</h2>
+    </div>
+    <!--폼-->
+    <div class="row justify-content-center">
+      <form class="needs-validation col-md-4" th:action="@{/signup}" th:object="${signupForm}" method="post" novalidate>
+        <div class="form-group mb-3">
+          <label for="username" class="mb-2">이메일</label>
+          <input id="username" name="username" type="email" th:field="*{username}" class="form-control"
+                 aria-describedby="usernameHelp" required>
+          <small class="invalid-feedback">이메일을 입력하세요.</small>
+          <small class="form-text text-danger" th:errors="*{username}">Email Error</small>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="nickname" class="mb-2">닉네임</label>
+          <input id="nickname" type="text" th:field="*{nickname}" class="form-control"
+                 aria-describedby="nicknameHelp" required minlength="3" maxlength="10">
+          <small id="nicknameHelp" class="form-text text-muted">
+            공백없이 문자와 숫자로만 3자 이상 20자 이내
+          </small>
+          <small class="invalid-feedback">닉네임을 입력하세요.</small>
+          <small class="form-text text-danger" th:errors="*{nickname}">Nickname Error</small>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="password" class="mb-2">비밀번호</label>
+          <input id="password" type="password" th:field="*{password}" class="form-control"
+                 aria-describedby="passwordHelp" required minlength="8" maxlength="50">
+          <small id="passwordHelp" class="form-text text-muted">
+            영문자, 숫자, 특수기호로 8자 이상 50자 이내
+          </small>
+          <small class="invalid-feedback">비밀번호를 입력하세요.</small>
+          <small class="form-text text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</small>
+        </div>
+
+        <div class="form-group d-grid gap-2 mb-2">
+          <button class="btn btn-primary mb-2" type="submit" aria-describedby="submitHelp">
+            가입하기
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="text-center">
+      <br>
+      <small class="form-text text-muted">아직 계정이 없으신가요? <a th:href="@{/signup}">가입하기</a></small>
+    </div>
+    <div class="text-center">
+      <small class="form-text text-muted"><a th:href="@{/emaillogin}">혹시 비밀번호를 잊으셨나요?</a></small>
+    </div>
+  </div>
+
+  <script type="application/javascript">
+    (function () {
+      'use strict';
+
+      window.addEventListener('load', function () {
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.getElementsByClassName('needs-validation');
+
+        // Loop over them and prevent submission
+        Array.prototype.filter.call(forms, function (form) {
+          form.addEventListener('submit', function (event) {
+            if (form.checkValidity() === false) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            form.classList.add('was-validated')
+          }, false)
+        })
+      }, false)
+    }())
+  </script>
+</body>
+</html>

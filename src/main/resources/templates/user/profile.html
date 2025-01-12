@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:fragment="profile">
+    <title>Profile</title>
+</head>
+
+<body>
+    <div th:fragment="profile" class="container">
+        <div class="mb-3 text-center">
+            <svg width="125" height="125" class="rounded-circle border bg-light"></svg>
+<!--                <img class="rounded-circle border bg-light" th:src="${user.profileImage}"
+             width="125" height="125" alt="name" th:alt="${user.nickname}"/>-->
+        </div>
+        <div class="text-center">
+            <h2 th:text="${profile.nickname}"></h2>
+        </div>
+
+        <div>
+            <p th:if="${!#strings.isEmpty(profile.username)}">
+                            <span style="font-size: 20px;">
+                                <i class="fa fa-link col-1"></i>
+                            </span>
+                <span th:text="${profile.username}" class="col-11"></span>
+            </p>
+            <p th:if="${!#strings.isEmpty(profile.occupation)}">
+                            <span style="font-size: 20px;">
+                                <i class="fa fa-link col-1"></i>
+                            </span>
+                <span th:text="${profile.occupation}" class="col-11"></span>
+            </p>
+            <p th:if="${!#strings.isEmpty(profile.company)}">
+                            <span style="font-size: 20px;">
+                                <i class="fa fa-link col-1"></i>
+                            </span>
+                <span th:text="${profile.company}" class="col-11"></span>
+            </p>
+            <p th:if="${!#strings.isEmpty(profile.url)}">
+                            <span style="font-size: 20px;">
+                                <i class="fa fa-link col-1"></i>
+                            </span>
+                <span th:text="${profile.url}" class="col-11"></span>
+            </p>
+            <p th:if="${!#strings.isEmpty(profile.description)}">
+                            <span style="font-size: 20px;">
+                                <i class="fa fa-link col-1"></i>
+                            </span>
+                <span th:text="${profile.description}" class="col-11"></span>
+            </p>
+        </div>
+
+        <div class="text-center">
+            <a class="btn btn-primary" th:href="@{/settings/profile}" role="button">프로필 수정</a>
+        </div>
+
+    </div>
+
+</body>
+</html>

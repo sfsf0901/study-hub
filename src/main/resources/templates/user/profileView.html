@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="~{layout/fragments.html :: head}"></head>
+
+<body>
+    <div th:replace="~{layout/fragments.html :: main-nav}"></div>
+
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-3">
+                <div th:replace="~{user/profile.html :: profile}"></div>
+            </div>
+
+            <div class="col-7">
+                Column
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>
