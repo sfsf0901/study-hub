@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<meta name="_csrf" content="${_csrf.token}"/>
+<meta name="_csrf_header" content="${_csrf.headerName}"/>
+<head th:replace="~{layout/fragments.html :: head}">
+    <style>
+        .tagify--outside {
+            border: 0 !important;
+        }
+        .tagify--outside .tagify__input {
+            order: -1 !important;
+            flex: 100% !important;
+            border: 1px solid var(--tags-border-color) !important;
+            margin-bottom: 1em !important;
+            transition: .1s !important;
+        }
+
+        .tagify--outside .tagify__input:hover {
+            border-color: var(--tags-hover-border-color) !important;
+        }
+
+        .tagify--outside.tagify--focus .tagify__input {
+            transition: 0s !important;
+            border-color: var(--tags-focus-border-color) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{layout/fragments.html :: main-nav}"></div>
+
+    <div class="container">
+        <div class="row mt-5 justify-content-center">
+            <div class="col-3">
+                <!-- 사이드 네비게이션 -->
+                <div th:replace="~{settings/layout/sideNav.html :: sideNav(currentMenu='studyTags')}"></div>
+            </div>
+
+            <div class="col-7">
+                <div class="card py-4 px-5">
+                    <div class="row">
+                        <div class="card-body">
+                            <h3 class="card-title">INTEREST TAGS</h3>
+                        </div>
+                    </div>
+
+                    <div class="row d-flex flex-md-row flex-column">
+                        <div class="card-body">
+                            <div class="alert alert-light mb-4" role="alert">
+                                <strong>관심 있는 키워드</strong>를 입력하면 해당 키워드와 관련된 스터디가 개설되었을 때 알림을 드려요.
+                            </div>
+                            <div class="mb-2">
+                                <i class="fa-solid fa-tag"></i><strong> Tags</strong>
+                            </div>
+                            <div id="whitelist" th:text="${#strings.listJoin(studyTags, ',')}" hidden></div>
+                            <input type="text" name="tags-outside" th:value="${#strings.listJoin(userStudyTags,',')}"
+                                   class="tagify--outside form-control mb-2" aria-describedby="tagHelp" placeholder="키워드를 입력하고 엔터를 누르세요"/>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="application/javascript" th:inline="javascript" th:fragment="ajax-csrf-header">
+        $(function() {
+            var csrfToken = /*[[${_csrf.token}]]*/ null;
+            var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
+            $(document).ajaxSend(function (e, xhr, options) {
+                xhr.setRequestHeader(csrfHeader, csrfToken);
+            });
+        });
+    </script>
+
+    <script type="application/javascript">
+        $(document).ready(function() {
+            var input = document.querySelector('input[name=tags-outside]');
+
+            var whitelistTags = document.querySelector("#whitelist").innerText.split(",").map(tag => tag.trim());
+
+            // Tagify 인스턴스 초기화
+            var tagify = new Tagify(input, {
+                whitelist: whitelistTags,
+                focusable: false,
+                dropdown: {
+                    position: 'input',
+                    maxItems: 10,
+                    enabled: 0 // always opens dropdown when input gets focus
+                }
+            });
+
+            // 태그 추가 후 서버로 전송하는 함수
+            function onAdd(e) {
+                var tagName = e.detail.data.value;
+
+                // Ajax를 사용하여 서버로 전송
+                $.ajax({
+                    url: '/settings/studytags/add', // 서버로 요청
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ 'tagName': tagName }), // JSON 형식으로 데이터 전송
+                    success: function(response) {
+                        console.log("태그가 성공적으로 추가되었습니다:", response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("태그 추가 실패:", status, error);
+                    }
+                });
+            }
+
+            // 태그 삭제 후 서버로 전송하는 함수
+            function onRemove(e) {
+                var tagName = e.detail.data.value;
+
+                $.ajax({
+                    url: '/settings/studytags/remove', // 태그 삭제 요청
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ 'tagName': tagName }), // 삭제할 태그 이름 전송
+                    success: function(response) {
+                        console.log("태그가 성공적으로 삭제되었습니다:", response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("태그 삭제 실패:", status, error);
+                    }
+                });
+            }
+
+            // Tagify에 이벤트 리스너 추가
+            tagify.on("add", onAdd);
+            tagify.on("remove", onRemove);
+
+            // Tagify input의 클래스를 추가하여 스타일 변경
+            tagify.DOM.input.classList.add('tagify--outside');
+        });
+    </script>
+</body>
+</html>

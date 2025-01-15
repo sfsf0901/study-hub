@@ -4,13 +4,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import me.cho.snackball.domain.Authority;
+import me.cho.snackball.domain.StudyTag;
 import me.cho.snackball.domain.User;
+import me.cho.snackball.domain.UserStudyTag;
 import me.cho.snackball.repository.UserRepository;
 import me.cho.snackball.global.security.CustomUserDetails;
 import me.cho.snackball.settings.UpdateNotificationsForm;
 import me.cho.snackball.settings.UpdatePasswordForm;
 import me.cho.snackball.settings.UpdateProfileForm;
+import me.cho.snackball.settings.UpdateStudyTagsForm;
+import me.cho.snackball.studyTag.StudyTagRepository;
+import me.cho.snackball.studyTag.UserStudyTagRepository;
 import me.cho.snackball.user.dto.SignupForm;
 import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
@@ -18,12 +22,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +37,8 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final StudyTagRepository studyTagRepository;
+    private final UserStudyTagRepository userStudyTagRepository;
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
@@ -44,15 +52,7 @@ public class UserService {
     }
 
     private User saveUser(SignupForm signUpForm) {
-        User user = User.builder()
-                .username(signUpForm.getUsername())
-                .nickname(signUpForm.getNickname())
-                .password(passwordEncoder.encode(signUpForm.getPassword()))
-                .authority(Authority.ROLE_USER)
-                .studyCreatedByWeb(true)
-                .studyEnrollmentResultByWeb(true)
-                .studyUpdatedByWeb(true)
-                .build();
+        User user = User.createUser(signUpForm, passwordEncoder.encode(signUpForm.getPassword()));
         return userRepository.save(user);
     }
 
@@ -96,5 +96,39 @@ public class UserService {
     public void updateNotifications(User user, UpdateNotificationsForm updateNotificationsForm) {
         modelMapper.map(updateNotificationsForm, user);
         userRepository.save(user);
+    }
+
+    public void addStudyTags(User user, UpdateStudyTagsForm updateStudyTagsForm) {
+        User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+
+        StudyTag studyTag = studyTagRepository.findByName(updateStudyTagsForm.getTagName()).orElse(null);
+
+        if (studyTag == null) {
+            studyTag = studyTagRepository.save(StudyTag.builder().name(updateStudyTagsForm.getTagName()).build());
+        }
+
+        boolean duplicate = false;
+        for (UserStudyTag userStudyTag : findUser.getUserStudyTags()) {
+            if (userStudyTag.getStudyTag().getId().equals(studyTag.getId())) {
+                duplicate = true;
+            }
+        }
+        if (!duplicate) {
+            UserStudyTag.createUserStudyTag(findUser, studyTag);
+        }
+    }
+
+    public Set<UserStudyTag> getUserStudyTags(User user) {
+        User findUser = userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+        return findUser.getUserStudyTags();
+    }
+
+    public void removeStudyTags(User user, UpdateStudyTagsForm updateStudyTagsForm) {
+        User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+
+        //TODO 커스텀 예외 만들기
+        UserStudyTag userStudyTag = userStudyTagRepository.findByUserIdAndName(findUser.getId(), updateStudyTagsForm.getTagName()).orElseThrow(() -> new RuntimeException());
+        findUser.getUserStudyTags().remove(userStudyTag);
+        userStudyTagRepository.delete(userStudyTag);
     }
 }

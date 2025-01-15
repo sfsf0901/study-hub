@@ -3,8 +3,11 @@ package me.cho.snackball.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import me.cho.snackball.global.BaseEntity;
+import me.cho.snackball.user.dto.SignupForm;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -13,7 +16,7 @@ import java.util.UUID;
 @Builder @AllArgsConstructor @NoArgsConstructor
 public class User extends BaseEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -62,6 +65,21 @@ public class User extends BaseEntity {
 
 //    @ManyToMany
 //    private Set<Tag> tags;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<UserStudyTag> userStudyTags = new HashSet<>();
+
+
+    public static User createUser(SignupForm signUpForm, String password) {
+        User user = new User();
+        user.setUsername(signUpForm.getUsername());
+        user.setNickname(signUpForm.getNickname());
+        user.setPassword(password);
+        user.setAuthority(Authority.ROLE_USER);
+        user.setStudyCreatedByWeb(true);
+        user.setStudyEnrollmentResultByWeb(true);
+        user.setStudyUpdatedByWeb(true);
+        return user;
+    }
 
     public void generateEmailCheckToken() {
         this.emailCheckToken = UUID.randomUUID().toString();
