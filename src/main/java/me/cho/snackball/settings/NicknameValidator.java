@@ -24,7 +24,7 @@ public class NicknameValidator implements Validator {
 
         User user = userRepository.findByNickname(form.getNickname()).orElse(null);
 
-        if (user != null) {
+        if (user != null && !user.getNickname().equals(form.getNickname())) {
             errors.rejectValue("nickname", null, "이미 사용중인 닉네임입니다.");
         }
     }

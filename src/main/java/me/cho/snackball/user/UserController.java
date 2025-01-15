@@ -47,7 +47,7 @@ public class UserController {
 
     @GetMapping("/checkemailtoken")
     public String checkEmailToken(String token, String email, Model model, HttpServletRequest request) {
-        String view = "checkedEmail";
+        String view = "user/checkedEmail";
 
         User user = userRepository.findByUsername(email).orElse(null);
         if (user == null) {

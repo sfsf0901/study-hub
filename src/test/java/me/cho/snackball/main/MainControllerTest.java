@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -61,7 +62,8 @@ class MainControllerTest {
     void testLoginSuccess() throws Exception {
         mockMvc.perform(post("/login")
                         .param("username", "testuser@test.com")
-                        .param("password", "12345678"))
+                        .param("password", "12345678")
+                        .with(csrf()))
                 .andExpect(status().is3xxRedirection()) // 리다이렉트 확인
                 .andExpect(redirectedUrl("/"))
                 .andExpect(authenticated().withUsername("testuser@test.com")); // 성공 후 리다이렉트 URL 확인
@@ -72,7 +74,8 @@ class MainControllerTest {
     void testLoginFailure() throws Exception {
         mockMvc.perform(post("/login")
                         .param("username", "testuser")
-                        .param("password", "wrongpassword"))
+                        .param("password", "wrongpassword")
+                        .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login?error"))
                 .andExpect(unauthenticated());
@@ -81,7 +84,8 @@ class MainControllerTest {
     @Test
     @DisplayName("로그아웃 테스트")
     void testLogout() throws Exception {
-        mockMvc.perform(post("/logout"))
+        mockMvc.perform(post("/logout")
+                        .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"))
                 .andExpect(unauthenticated());

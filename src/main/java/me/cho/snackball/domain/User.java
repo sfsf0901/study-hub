@@ -13,7 +13,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 @Getter @Setter @EqualsAndHashCode(callSuper = false, of = "id")
-@Builder @AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor @NoArgsConstructor
 public class User extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
