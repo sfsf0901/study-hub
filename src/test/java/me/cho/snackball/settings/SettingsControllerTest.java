@@ -1,8 +1,13 @@
 package me.cho.snackball.settings;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import me.cho.snackball.WithUser;
+import me.cho.snackball.domain.StudyTag;
 import me.cho.snackball.domain.User;
+import me.cho.snackball.domain.UserStudyTag;
 import me.cho.snackball.repository.UserRepository;
+import me.cho.snackball.studyTag.StudyTagRepository;
+import me.cho.snackball.studyTag.UserStudyTagRepository;
 import me.cho.snackball.user.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +43,18 @@ class SettingsControllerTest {
     UserRepository userRepository;
 
     @Autowired
+    private StudyTagRepository studyTagRepository;
+
+    @Autowired
+    private UserStudyTagRepository userStudyTagRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+
 
     @AfterEach
     void afterEach() {
@@ -128,4 +145,58 @@ class SettingsControllerTest {
                 .andExpect(model().hasErrors())
                 .andExpect(model().attributeExists("updatePasswordForm"));
     }
+
+    @WithUser("testuser@test.com")
+    @DisplayName("GET /settings/studytags - 태그 수정 폼")
+    @Test
+    void updateStudyTagsForm() throws Exception {
+        mockMvc.perform(get(SettingsController.URL_SETTINGS_STUDY_TAGS))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/studyTags"))
+                .andExpect(model().attributeExists("studyTags"))
+                .andExpect(model().attributeExists("userStudyTags"));
+    }
+
+    @WithUser("testuser@test.com")
+    @DisplayName("POST /settings/studytags/add - 태그 추가")
+    @Test
+    void updateStudyTagsAddTest() throws Exception {
+        UpdateStudyTagsForm updateStudyTagsForm = new UpdateStudyTagsForm();
+        updateStudyTagsForm.setTagName("testTag");
+
+        mockMvc.perform(post(SettingsController.URL_SETTINGS_STUDY_TAGS + "/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateStudyTagsForm))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        StudyTag studyTag = studyTagRepository.findByName("testTag").orElse(null);
+        assertNotNull(studyTag);
+        assertNotNull(userRepository.findByUsername("testuser@test.com").orElse(null).getUserStudyTags().contains(studyTag));
+    }
+
+    @WithUser("testuser@test.com")
+    @DisplayName("POST /settings/studytags/remove - 태그 삭제")
+    @Test
+    void updateStudyTagsRemoveTest() throws Exception {
+        User user = userRepository.findByUsername("testuser@test.com").orElse(null);
+        StudyTag studyTag = studyTagRepository.save(StudyTag.builder().name("testTag").build());
+        UserStudyTag userStudyTag = UserStudyTag.createUserStudyTag(user, studyTag);
+//        userStudyTagRepository.save(userStudyTag);
+//        user.getUserStudyTags().add(userStudyTag);
+
+        assertTrue(user.getUserStudyTags().contains(userStudyTag));
+
+        UpdateStudyTagsForm updateStudyTagsForm = new UpdateStudyTagsForm();
+        updateStudyTagsForm.setTagName("testTag");
+
+        mockMvc.perform(post(SettingsController.URL_SETTINGS_STUDY_TAGS + "/remove")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateStudyTagsForm))
+                .with(csrf()))
+                .andExpect(status().isOk());
+
+        assertFalse(user.getUserStudyTags().contains(studyTag));
+    }
+
 }

@@ -8,7 +8,7 @@
     <div th:replace="~{layout/fragments.html :: main-nav}"></div>
 
     <div class="container">
-        <div class="row mt-5 justify-content-center">
+        <div class="row justify-content-center my-5">
             <div class="col-3">
                 <!-- 사이드 네비게이션 -->
                 <div th:replace="~{settings/layout/sideNav.html :: sideNav(currentMenu='notifications')}"></div>
@@ -25,7 +25,7 @@
                     <div class="row d-flex flex-md-row flex-column">
                         <div class="card-body">
                             <!-- 입력 폼 -->
-                            <div style="max-width: 500px;">
+
                                 <form th:action="@{/settings/notifications}" th:object="${updateNotificationsForm}" method="post" novalidate>
 
                                     <div class="alert alert-light" role="alert">
@@ -87,7 +87,7 @@
                                          <a th:href="@{'/profile/' + ${#authentication.principal.nickname}}">프로필로 돌아가기</a>
                                     </span>
                                 </div>
-                            </div>
+
                         </div>
                     </div>
 

@@ -32,7 +32,7 @@
     <div th:replace="~{layout/fragments.html :: main-nav}"></div>
 
     <div class="container">
-        <div class="row mt-5 justify-content-center">
+        <div class="row justify-content-center my-5">
             <div class="col-3">
                 <!-- 사이드 네비게이션 -->
                 <div th:replace="~{settings/layout/sideNav.html :: sideNav(currentMenu='studyTags')}"></div>
@@ -135,6 +135,7 @@
 
             // Tagify input의 클래스를 추가하여 스타일 변경
             tagify.DOM.input.classList.add('tagify--outside');
+            // tagify.DOM.scope.parentNode.insertBefore(tagify.DOM.input, tagify.DOM.scope);
         });
     </script>
 </body>
