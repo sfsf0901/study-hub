@@ -67,7 +67,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <form class="d-flex me-3">
-                        <input class="form-control" type="search" placeholder="스터디 검색" aria-label="Search">
+                        <input class="form-control" type="search" placeholder="Search" aria-label="Search">
                     </form>
                 </li>
             </ul>
@@ -84,13 +84,14 @@
                 </li>
 
                 <li class="nav-item me-2" sec:authorize="isAuthenticated()">
-                    <a class="btn btn-outline-dark" th:href="@{/notifications}">
-                        <i class="fa fa-plus" aria-hidden="true"></i> 스터디 개설
+                    <a class="btn btn-outline-primary" th:href="@{/notifications}">
+                        <i class="fa fa-plus" aria-hidden="true"></i> 스터디 만들기
                     </a>
                 </li>
                 <li class="nav-item" sec:authorize="isAuthenticated()">
                     <a class="nav-link" th:href="@{/notifications}">
-                        <i class="fa fa-bell-o" aria-hidden="true"></i>
+                        <i class="fa-solid fa-bell"></i>
+<!--                        <i class="fa fa-bell-o" aria-hidden="true"></i>-->
                     </a>
                 </li>
                 <li class="nav-item dropdown" sec:authorize="isAuthenticated()">

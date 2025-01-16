@@ -26,18 +26,17 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/settings")
 public class SettingsController {
 
-    public static final String URL_PROFILE = "/profile";
+    public static final String URL_PROFILE = "/settings/profile";
     public static final String VIEW_PROFILE = "settings/profile";
-    public static final String URL_PASSWORD = "/password";
+    public static final String URL_PASSWORD = "/settings/password";
     public static final String VIEW_PASSWORD = "settings/password";
-    public static final String URL_NOTIFICATIONS = "/notifications";
+    public static final String URL_NOTIFICATIONS = "/settings/notifications";
     public static final String VIEW_NOTIFICATIONS = "settings/notifications";
-    public static final String URL_STUDY_TAGS = "/studytags";
+    public static final String URL_STUDY_TAGS = "/settings/studytags";
     public static final String VIEW_STUDY_TAGS = "settings/studyTags";
-    public static final String URL_LOCATIONS = "/locations";
+    public static final String URL_LOCATIONS = "/settings/locations";
     public static final String VIEW_LOCATIONS = "settings/locations";
 
 

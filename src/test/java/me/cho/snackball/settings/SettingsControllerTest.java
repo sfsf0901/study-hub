@@ -2,6 +2,7 @@ package me.cho.snackball.settings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.cho.snackball.WithUser;
+import me.cho.snackball.settings.location.*;
 import me.cho.snackball.settings.studyTag.StudyTag;
 import me.cho.snackball.user.domain.User;
 import me.cho.snackball.settings.studyTag.UserStudyTag;
@@ -11,6 +12,7 @@ import me.cho.snackball.settings.studyTag.UserStudyTagRepository;
 import me.cho.snackball.settings.studyTag.UpdateStudyTagsForm;
 import me.cho.snackball.user.UserService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,19 +47,22 @@ class SettingsControllerTest {
     private StudyTagRepository studyTagRepository;
 
     @Autowired
-    private UserStudyTagRepository userStudyTagRepository;
+    private LocationRepository locationRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-
+    @Autowired
+    private UserStudyTagRepository userStudyTagRepository;
+    @Autowired
+    private UserLocationRepository userLocationRepository;
 
     @AfterEach
     void afterEach() {
         userRepository.deleteAll();
+        locationRepository.deleteAll();
     }
 
     @WithUser("testuser@test.com")
@@ -146,7 +151,7 @@ class SettingsControllerTest {
     }
 
     @WithUser("testuser@test.com")
-    @DisplayName("GET /settings/studytags - 태그 수정 폼")
+    @DisplayName("GET /settings/studytags - 관심 키워드 수정 폼")
     @Test
     void updateStudyTagsForm() throws Exception {
         mockMvc.perform(get(SettingsController.URL_STUDY_TAGS))
@@ -157,7 +162,7 @@ class SettingsControllerTest {
     }
 
     @WithUser("testuser@test.com")
-    @DisplayName("POST /settings/studytags/add - 태그 추가")
+    @DisplayName("POST /settings/studytags/add - 관심 키워드 추가")
     @Test
     void updateStudyTagsAddTest() throws Exception {
         UpdateStudyTagsForm updateStudyTagsForm = new UpdateStudyTagsForm();
@@ -169,18 +174,19 @@ class SettingsControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        StudyTag studyTag = studyTagRepository.findByName("testTag").orElse(null);
-        assertNotNull(studyTag);
-        assertNotNull(userRepository.findByUsername("testuser@test.com").orElse(null).getUserStudyTags().contains(studyTag));
+        UserStudyTag userStudyTag = userStudyTagRepository.findByName("testTag").orElse(null);
+        assertNotNull(userStudyTag);
+        assertNotNull(userRepository.findByUsername("testuser@test.com").orElse(null).getUserStudyTags().contains(userStudyTag));
     }
 
     @WithUser("testuser@test.com")
-    @DisplayName("POST /settings/studytags/remove - 태그 삭제")
+    @DisplayName("POST /settings/studytags/remove - 관심 키워드 삭제")
     @Test
     void updateStudyTagsRemoveTest() throws Exception {
         User user = userRepository.findByUsername("testuser@test.com").orElse(null);
         StudyTag studyTag = studyTagRepository.save(StudyTag.builder().name("testTag").build());
         UserStudyTag userStudyTag = UserStudyTag.createUserStudyTag(user, studyTag);
+        //TODO 불필요한듯???
 //        userStudyTagRepository.save(userStudyTag);
 //        user.getUserStudyTags().add(userStudyTag);
 
@@ -198,4 +204,54 @@ class SettingsControllerTest {
         assertFalse(user.getUserStudyTags().contains(studyTag));
     }
 
+    @WithUser("testuser@test.com")
+    @DisplayName("GET /settings/locations - 활동 지역 수정 폼")
+    @Test
+    void updateLocationsForm() throws Exception {
+        mockMvc.perform(get(SettingsController.URL_LOCATIONS))
+                .andExpect(status().isOk())
+                .andExpect(view().name("settings/locations"))
+                .andExpect(model().attributeExists("locations"))
+                .andExpect(model().attributeExists("userLocations"));
+    }
+
+    @WithUser("testuser@test.com")
+    @DisplayName("POST /settings/locations/add - 활동 지역 추가")
+    @Test
+    void updateLocationsAddTest() throws Exception {
+        UpdateLocationForm updateLocationForm = new UpdateLocationForm();
+        updateLocationForm.setProvinceAndCity("서울특별시 / 송파구");
+
+        mockMvc.perform(post(SettingsController.URL_LOCATIONS + "/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateLocationForm))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        UserLocation userLocation = userLocationRepository.findByProvinceAndCity(updateLocationForm.getProvince(), updateLocationForm.getCity()).orElse(null);
+        assertNotNull(userLocation);
+        assertNotNull(userRepository.findByUsername("testuser@test.com").orElse(null).getUserLocations().contains(userLocation));
+    }
+
+    @WithUser("testuser@test.com")
+    @DisplayName("POST /settings/locations/remove - 활동 지역 삭제")
+    @Test
+    void updateLocationsRemoveTest() throws Exception {
+        User user = userRepository.findByUsername("testuser@test.com").orElse(null);
+        Location location = locationRepository.findByProvinceAndCity("서울특별시", "송파구").orElse(null);
+        UserLocation userLocation = UserLocation.createUserLocation(user, location);
+
+        assertTrue(user.getUserLocations().contains(userLocation));
+
+        UpdateLocationForm updateLocationForm = new UpdateLocationForm();
+        updateLocationForm.setProvinceAndCity("서울특별시 / 송파구");
+
+        mockMvc.perform(post(SettingsController.URL_LOCATIONS + "/remove")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateLocationForm))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        assertFalse(user.getUserStudyTags().contains(userLocation));
+    }
 }
