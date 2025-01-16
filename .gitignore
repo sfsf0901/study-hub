@@ -38,3 +38,6 @@ out/
 
 ### NPM ###
 node_modules/
+
+### Ignore application.properties ###
+src/main/resources/application.properties
