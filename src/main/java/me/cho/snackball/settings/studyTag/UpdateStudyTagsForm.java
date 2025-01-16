@@ -1,7 +1,6 @@
-package me.cho.snackball.settings;
+package me.cho.snackball.settings.studyTag;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 @Data

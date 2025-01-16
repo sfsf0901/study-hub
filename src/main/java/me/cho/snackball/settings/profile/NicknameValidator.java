@@ -1,8 +1,8 @@
-package me.cho.snackball.settings;
+package me.cho.snackball.settings.profile;
 
 import lombok.RequiredArgsConstructor;
-import me.cho.snackball.domain.User;
-import me.cho.snackball.repository.UserRepository;
+import me.cho.snackball.user.domain.User;
+import me.cho.snackball.user.UserRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

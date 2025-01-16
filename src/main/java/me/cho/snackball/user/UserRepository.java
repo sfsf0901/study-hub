@@ -1,6 +1,6 @@
-package me.cho.snackball.repository;
+package me.cho.snackball.user;
 
-import me.cho.snackball.domain.User;
+import me.cho.snackball.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 

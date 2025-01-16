@@ -35,27 +35,27 @@
         <div class="row justify-content-center my-5">
             <div class="col-3">
                 <!-- 사이드 네비게이션 -->
-                <div th:replace="~{settings/layout/sideNav.html :: sideNav(currentMenu='studyTags')}"></div>
+                <div th:replace="~{settings/layout/sideNav.html :: sideNav(currentMenu='locations')}"></div>
             </div>
 
             <div class="col-7">
                 <div class="card py-4 px-5">
                     <div class="row">
                         <div class="card-body">
-                            <h3 class="card-title">KEYWORDS</h3>
+                            <h3 class="card-title">LOCATIONS</h3>
                         </div>
                     </div>
 
                     <div class="row d-flex flex-md-row flex-column">
                         <div class="card-body">
                             <div class="alert alert-light mb-4" role="alert">
-                                <strong>관심 있는 키워드</strong>를 입력하면 해당 키워드와 관련된 스터디가 개설되었을 때 알림을 드려요.
+                                <strong>주요 활동 지역</strong>을 입력하면 해당 지역에 스터디가 개설되었을 때 알림을 드려요.
                             </div>
                             <div class="mb-2">
                                 <i class="fa-solid fa-tag"></i><strong> Tags</strong>
                             </div>
-                            <div id="whitelist" th:text="${#strings.listJoin(studyTags, ',')}" hidden></div>
-                            <input type="text" name="tags-outside" th:value="${#strings.listJoin(userStudyTags,',')}"
+                            <div id="whitelist" th:text="${#strings.listJoin(locations, ',')}" hidden></div>
+                            <input type="text" name="tags-outside" th:value="${#strings.listJoin(userLocations,',')}"
                                    class="tagify--outside form-control mb-2" aria-describedby="tagHelp" placeholder="키워드를 입력하고 엔터를 누르세요"/>
                         </div>
                     </div>
@@ -94,14 +94,14 @@
 
             // 태그 추가 후 서버로 전송하는 함수
             function onAdd(e) {
-                var tagName = e.detail.data.value;
+                var provinceAndCity = e.detail.data.value;
 
                 // Ajax를 사용하여 서버로 전송
                 $.ajax({
-                    url: '/settings/studytags/add', // 서버로 요청
+                    url: '/settings/locations/add', // 서버로 요청
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({ 'tagName': tagName }), // JSON 형식으로 데이터 전송
+                    data: JSON.stringify({ 'provinceAndCity': provinceAndCity }), // JSON 형식으로 데이터 전송
                     success: function(response) {
                         console.log("태그가 성공적으로 추가되었습니다:", response);
                     },
@@ -113,13 +113,13 @@
 
             // 태그 삭제 후 서버로 전송하는 함수
             function onRemove(e) {
-                var tagName = e.detail.data.value;
+                var provinceAndCity = e.detail.data.value;
 
                 $.ajax({
-                    url: '/settings/studytags/remove', // 태그 삭제 요청
+                    url: '/settings/locations/remove', // 태그 삭제 요청
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({ 'tagName': tagName }), // 삭제할 태그 이름 전송
+                    data: JSON.stringify({ 'provinceAndCity': provinceAndCity }), // 삭제할 태그 이름 전송
                     success: function(response) {
                         console.log("태그가 성공적으로 삭제되었습니다:", response);
                     },

@@ -1,6 +1,6 @@
 package me.cho.snackball.main;
 
-import me.cho.snackball.repository.UserRepository;
+import me.cho.snackball.user.UserRepository;
 import me.cho.snackball.user.UserService;
 import me.cho.snackball.user.dto.SignupForm;
 import org.junit.jupiter.api.AfterEach;

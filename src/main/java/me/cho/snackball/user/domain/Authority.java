@@ -1,4 +1,4 @@
-package me.cho.snackball.domain;
+package me.cho.snackball.user.domain;
 
 public enum Authority {
     ROLE_ADMIN, ROLE_USER

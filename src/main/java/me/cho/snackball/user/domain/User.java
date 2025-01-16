@@ -1,7 +1,9 @@
-package me.cho.snackball.domain;
+package me.cho.snackball.user.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import me.cho.snackball.settings.location.UserLocation;
+import me.cho.snackball.settings.studyTag.UserStudyTag;
 import me.cho.snackball.global.BaseEntity;
 import me.cho.snackball.user.dto.SignupForm;
 
@@ -67,6 +69,9 @@ public class User extends BaseEntity {
 //    private Set<Tag> tags;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<UserStudyTag> userStudyTags = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<UserLocation> userLocations = new HashSet<>();
 
 
     public static User createUser(SignupForm signUpForm, String password) {

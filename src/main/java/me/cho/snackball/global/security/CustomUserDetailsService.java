@@ -1,8 +1,8 @@
 package me.cho.snackball.global.security;
 
 import lombok.RequiredArgsConstructor;
-import me.cho.snackball.domain.User;
-import me.cho.snackball.repository.UserRepository;
+import me.cho.snackball.user.domain.User;
+import me.cho.snackball.user.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

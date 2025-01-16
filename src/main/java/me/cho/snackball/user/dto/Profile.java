@@ -1,7 +1,7 @@
 package me.cho.snackball.user.dto;
 
 import lombok.Data;
-import me.cho.snackball.domain.User;
+import me.cho.snackball.user.domain.User;
 
 @Data
 public class Profile {

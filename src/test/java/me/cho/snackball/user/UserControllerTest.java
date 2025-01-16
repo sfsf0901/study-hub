@@ -1,8 +1,7 @@
 package me.cho.snackball.user;
 
-import me.cho.snackball.domain.Authority;
-import me.cho.snackball.domain.User;
-import me.cho.snackball.repository.UserRepository;
+import me.cho.snackball.user.domain.Authority;
+import me.cho.snackball.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

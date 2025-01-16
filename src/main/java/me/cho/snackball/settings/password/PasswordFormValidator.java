@@ -1,6 +1,5 @@
-package me.cho.snackball.settings;
+package me.cho.snackball.settings.password;
 
-import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 

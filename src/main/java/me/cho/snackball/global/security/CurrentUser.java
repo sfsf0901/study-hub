@@ -1,4 +1,4 @@
-package me.cho.snackball.user;
+package me.cho.snackball.global.security;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 

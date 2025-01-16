@@ -1,7 +1,6 @@
 package me.cho.snackball.user;
 
 import lombok.RequiredArgsConstructor;
-import me.cho.snackball.repository.UserRepository;
 import me.cho.snackball.user.dto.SignupForm;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;

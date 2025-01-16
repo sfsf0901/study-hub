@@ -1,8 +1,5 @@
 package me.cho.snackball.main;
 
-import jakarta.validation.Valid;
-import me.cho.snackball.domain.User;
-import me.cho.snackball.user.CurrentUser;
 import me.cho.snackball.user.dto.LoginForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

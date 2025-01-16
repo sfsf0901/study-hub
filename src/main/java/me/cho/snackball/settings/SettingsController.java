@@ -2,11 +2,15 @@ package me.cho.snackball.settings;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import me.cho.snackball.domain.StudyTag;
-import me.cho.snackball.domain.User;
-import me.cho.snackball.domain.UserStudyTag;
-import me.cho.snackball.studyTag.StudyTagRepository;
-import me.cho.snackball.user.CurrentUser;
+import me.cho.snackball.settings.location.*;
+import me.cho.snackball.settings.password.PasswordFormValidator;
+import me.cho.snackball.settings.profile.NicknameValidator;
+import me.cho.snackball.settings.studyTag.*;
+import me.cho.snackball.user.domain.User;
+import me.cho.snackball.global.security.CurrentUser;
+import me.cho.snackball.settings.notification.UpdateNotificationsForm;
+import me.cho.snackball.settings.password.UpdatePasswordForm;
+import me.cho.snackball.settings.profile.UpdateProfileForm;
 import me.cho.snackball.user.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -17,29 +21,33 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/settings")
 public class SettingsController {
 
-    public static final String URL_SETTINGS_PROFILE = "/settings/profile";
-    public static final String VIEW_SETTINGS_PROFILE = "settings/profile";
-    public static final String URL_SETTINGS_PASSWORD = "/settings/password";
-    public static final String VIEW_SETTINGS_PASSWORD = "settings/password";
-    public static final String URL_SETTINGS_NOTIFICATIONS = "/settings/notifications";
-    public static final String VIEW_SETTINGS_NOTIFICATIONS = "settings/notifications";
-    public static final String URL_SETTINGS_STUDY_TAGS = "/settings/studytags";
-    public static final String VIEW_SETTINGS_STUDY_TAGS = "settings/studyTags";
+    public static final String URL_PROFILE = "/profile";
+    public static final String VIEW_PROFILE = "settings/profile";
+    public static final String URL_PASSWORD = "/password";
+    public static final String VIEW_PASSWORD = "settings/password";
+    public static final String URL_NOTIFICATIONS = "/notifications";
+    public static final String VIEW_NOTIFICATIONS = "settings/notifications";
+    public static final String URL_STUDY_TAGS = "/studytags";
+    public static final String VIEW_STUDY_TAGS = "settings/studyTags";
+    public static final String URL_LOCATIONS = "/locations";
+    public static final String VIEW_LOCATIONS = "settings/locations";
+
 
     private final UserService userService;
     private final StudyTagRepository studyTagRepository;
+    private final UserStudyTagRepository userStudyTagRepository;
+    private final LocationRepository locationRepository;
     private final ModelMapper modelMapper;
     private final NicknameValidator nicknameValidator;
+    private final UserLocationRepository userLocationRepository;
 
     @InitBinder("updatePasswordForm")
     public void passwordInitBinder(WebDataBinder binder) {
@@ -51,14 +59,15 @@ public class SettingsController {
         binder.addValidators(nicknameValidator);
     }
 
-    @GetMapping(URL_SETTINGS_PROFILE)
+
+    @GetMapping(URL_PROFILE)
     public String updateProfileForm(@CurrentUser User user, Model model) {
 
         model.addAttribute("updateProfileForm", modelMapper.map(user, UpdateProfileForm.class));
-        return VIEW_SETTINGS_PROFILE;
+        return VIEW_PROFILE;
     }
 
-    @PostMapping(URL_SETTINGS_PROFILE)
+    @PostMapping(URL_PROFILE)
     public String updateProfile(@CurrentUser User user,
                                 @Valid UpdateProfileForm updateProfileForm,
                                 BindingResult bindingResult,
@@ -66,57 +75,57 @@ public class SettingsController {
                                 RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
 //            model.addAttribute("updateProfileForm", updateProfileForm);
-            return VIEW_SETTINGS_PROFILE;
+            return VIEW_PROFILE;
         }
 
         userService.updateProfile(user, updateProfileForm);
         redirectAttributes.addFlashAttribute("message", "프로필을 수정했습니다.");
-        return "redirect:" + URL_SETTINGS_PROFILE;
+        return "redirect:" + URL_PROFILE;
     }
 
-    @GetMapping(URL_SETTINGS_PASSWORD)
+    @GetMapping(URL_PASSWORD)
     public String updatePasswordForm(@CurrentUser User user, Model model) {
         model.addAttribute(new UpdatePasswordForm());
-        return VIEW_SETTINGS_PASSWORD;
+        return VIEW_PASSWORD;
     }
 
-    @PostMapping(URL_SETTINGS_PASSWORD)
+    @PostMapping(URL_PASSWORD)
     public String updatePassword(@CurrentUser User user,
                                  @Valid UpdatePasswordForm updatePasswordForm,
                                  BindingResult bindingResult,
                                  Model model,
                                  RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            return VIEW_SETTINGS_PASSWORD;
+            return VIEW_PASSWORD;
         }
 
         userService.updatePassword(user, updatePasswordForm);
         redirectAttributes.addFlashAttribute("message", "비밀번호를 변경했습니다.");
-        return "redirect:" + URL_SETTINGS_PASSWORD;
+        return "redirect:" + URL_PASSWORD;
     }
 
-    @GetMapping(URL_SETTINGS_NOTIFICATIONS)
+    @GetMapping(URL_NOTIFICATIONS)
     public String updateNotificationsForm(@CurrentUser User user, Model model) {
         model.addAttribute(modelMapper.map(user, UpdateNotificationsForm.class));
-        return VIEW_SETTINGS_NOTIFICATIONS;
+        return VIEW_NOTIFICATIONS;
     }
 
-    @PostMapping(URL_SETTINGS_NOTIFICATIONS)
+    @PostMapping(URL_NOTIFICATIONS)
     public String updateNotifications(@CurrentUser User user,
                                       @Valid UpdateNotificationsForm updateNotificationsForm,
                                       BindingResult bindingResult,
                                       Model model,
                                       RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            return VIEW_SETTINGS_NOTIFICATIONS;
+            return VIEW_NOTIFICATIONS;
         }
 
         userService.updateNotifications(user, updateNotificationsForm);
         redirectAttributes.addFlashAttribute("message", "알림 설정을 변경했습니다.");
-        return "redirect:" + URL_SETTINGS_NOTIFICATIONS;
+        return "redirect:" + URL_NOTIFICATIONS;
     }
 
-    @GetMapping(URL_SETTINGS_STUDY_TAGS)
+    @GetMapping(URL_STUDY_TAGS)
     public String updateStudyTagsForm(@CurrentUser User user, Model model) {
 //        model.addAttribute(user);
         List<StudyTag> studyTags = studyTagRepository.findAll();
@@ -124,15 +133,14 @@ public class SettingsController {
 
         Set<UserStudyTag> userStudyTags = userService.getUserStudyTags(user);
         model.addAttribute("userStudyTags", userStudyTags.stream().map(UserStudyTag::getName).collect(Collectors.toList()));
-        return VIEW_SETTINGS_STUDY_TAGS;
+        return VIEW_STUDY_TAGS;
     }
 
-    @PostMapping(URL_SETTINGS_STUDY_TAGS + "/add")
+    @PostMapping(URL_STUDY_TAGS + "/add")
     @ResponseBody
     public ResponseEntity<Map<String, String>> addTags(@CurrentUser User user,
                                                        @RequestBody UpdateStudyTagsForm updateStudyTagsForm) {
-        System.out.println(updateStudyTagsForm.getTagName());
-        userService.addStudyTags(user, updateStudyTagsForm);
+        userService.addStudyTag(user, updateStudyTagsForm);
 
         // JSON 응답을 반환
         Map<String, String> response = new HashMap<>();
@@ -140,11 +148,67 @@ public class SettingsController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(URL_SETTINGS_STUDY_TAGS + "/remove")
+    @PostMapping(URL_STUDY_TAGS + "/remove")
     @ResponseBody
     public ResponseEntity<Map<String, String>> removeTags(@CurrentUser User user,
                                                        @RequestBody UpdateStudyTagsForm updateStudyTagsForm) {
-        userService.removeStudyTags(user, updateStudyTagsForm);
+        UserStudyTag userStudyTag = userStudyTagRepository.findByUserIdAndName(user.getId(), updateStudyTagsForm.getTagName()).orElse(null);
+        if (userStudyTag == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        userService.removeUserStudyTag(user, userStudyTag);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "success");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(URL_LOCATIONS)
+    public String updateLocationsForm(@CurrentUser User user, Model model) {
+        List<Location> locations = locationRepository.findAll();
+        model.addAttribute("locations",
+                locations.stream()
+                        .sorted(Comparator.comparing(Location::getProvince).thenComparing(Location::getCity))
+                        .map(Location::toString)
+                        .collect(Collectors.toList()));
+
+        Set<UserLocation> userLocations = userService.getUserLocations(user);
+        model.addAttribute("userLocations",
+                userLocations.stream()
+                        .sorted(Comparator.comparing(UserLocation::getProvince).thenComparing(UserLocation::getCity))
+                        .map(UserLocation::toString).collect(Collectors.toList()));
+
+        return VIEW_LOCATIONS;
+    }
+
+    @PostMapping(URL_LOCATIONS + "/add")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> addLocations(@CurrentUser User user,
+                                                       @RequestBody UpdateLocationForm updateLocationForm) {
+        Location location = locationRepository.findByProvinceAndCity(updateLocationForm.getProvince(), updateLocationForm.getCity()).orElse(null);
+        if (location == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        userService.addLocation(user, location);
+
+        // JSON 응답을 반환
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "success");
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(URL_LOCATIONS + "/remove")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> removeTags(@CurrentUser User user,
+                                                          @RequestBody UpdateLocationForm updateLocationForm) {
+        UserLocation userLocation = userLocationRepository.findByProvinceAndCity(updateLocationForm.getProvince(), updateLocationForm.getCity()).orElse(null);
+        if (userLocation == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        userService.removeUserLocation(user, userLocation);
 
         Map<String, String> response = new HashMap<>();
         response.put("status", "success");

@@ -2,7 +2,7 @@ package me.cho.snackball.global.security;
 
 
 import lombok.Getter;
-import me.cho.snackball.domain.User;
+import me.cho.snackball.user.domain.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

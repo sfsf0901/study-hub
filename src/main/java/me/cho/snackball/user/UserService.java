@@ -1,22 +1,24 @@
 package me.cho.snackball.user;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import me.cho.snackball.domain.StudyTag;
-import me.cho.snackball.domain.User;
-import me.cho.snackball.domain.UserStudyTag;
-import me.cho.snackball.repository.UserRepository;
+import me.cho.snackball.settings.location.*;
+import me.cho.snackball.settings.studyTag.StudyTag;
+import me.cho.snackball.user.domain.User;
+import me.cho.snackball.settings.studyTag.UserStudyTag;
 import me.cho.snackball.global.security.CustomUserDetails;
-import me.cho.snackball.settings.UpdateNotificationsForm;
-import me.cho.snackball.settings.UpdatePasswordForm;
-import me.cho.snackball.settings.UpdateProfileForm;
-import me.cho.snackball.settings.UpdateStudyTagsForm;
-import me.cho.snackball.studyTag.StudyTagRepository;
-import me.cho.snackball.studyTag.UserStudyTagRepository;
+import me.cho.snackball.settings.notification.UpdateNotificationsForm;
+import me.cho.snackball.settings.password.UpdatePasswordForm;
+import me.cho.snackball.settings.profile.UpdateProfileForm;
+import me.cho.snackball.settings.studyTag.UpdateStudyTagsForm;
+import me.cho.snackball.settings.studyTag.StudyTagRepository;
+import me.cho.snackball.settings.studyTag.UserStudyTagRepository;
 import me.cho.snackball.user.dto.SignupForm;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +30,9 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Set;
 
@@ -39,10 +44,24 @@ public class UserService {
     private final UserRepository userRepository;
     private final StudyTagRepository studyTagRepository;
     private final UserStudyTagRepository userStudyTagRepository;
+    private final LocationRepository locationRepository;
+    private final UserLocationRepository userLocationRepository;
     private final JavaMailSender javaMailSender;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
+    @PostConstruct
+    public void initLocationData() throws IOException {
+        if (locationRepository.count() == 0) {
+            Resource resource = new ClassPathResource("location_kr.csv");
+            List<Location> locations = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8).stream()
+                    .map(line -> {
+                        String[] parts = line.split(",");
+                        return Location.builder().province(parts[0]).city(parts[1]).build();
+                    }).toList();
+            locationRepository.saveAll(locations);
+        }
+    }
 
     public User processNewAccount(SignupForm signUpForm) {
         User newUser = saveUser(signUpForm);
@@ -98,7 +117,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void addStudyTags(User user, UpdateStudyTagsForm updateStudyTagsForm) {
+    public void addStudyTag(User user, UpdateStudyTagsForm updateStudyTagsForm) {
         User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
 
         StudyTag studyTag = studyTagRepository.findByName(updateStudyTagsForm.getTagName()).orElse(null);
@@ -115,6 +134,7 @@ public class UserService {
         }
         if (!duplicate) {
             UserStudyTag.createUserStudyTag(findUser, studyTag);
+            //TODO save 안해도 저장되네???
         }
     }
 
@@ -123,12 +143,36 @@ public class UserService {
         return findUser.getUserStudyTags();
     }
 
-    public void removeStudyTags(User user, UpdateStudyTagsForm updateStudyTagsForm) {
+    public void removeUserStudyTag(User user, UserStudyTag userStudyTag) {
         User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
 
-        //TODO 커스텀 예외 만들기
-        UserStudyTag userStudyTag = userStudyTagRepository.findByUserIdAndName(findUser.getId(), updateStudyTagsForm.getTagName()).orElseThrow(() -> new RuntimeException());
         findUser.getUserStudyTags().remove(userStudyTag);
         userStudyTagRepository.delete(userStudyTag);
+    }
+
+    public Set<UserLocation> getUserLocations(User user) {
+        User findUser = userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+        return findUser.getUserLocations();
+    }
+
+    public void addLocation(User user, Location location) {
+        User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+
+        boolean duplicate = false;
+        for (UserLocation userLocation : findUser.getUserLocations()) {
+            if (userLocation.getId().equals(location.getId())) {
+                duplicate = true;
+            }
+        }
+        if (!duplicate) {
+            UserLocation.createUserLocation(findUser, location);
+        }
+    }
+
+    public void removeUserLocation(User user, UserLocation userLocation) {
+        User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+
+        findUser.getUserLocations().remove(userLocation);
+        userLocationRepository.delete(userLocation);
     }
 }
