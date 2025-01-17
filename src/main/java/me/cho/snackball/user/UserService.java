@@ -1,13 +1,19 @@
 package me.cho.snackball.user;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import me.cho.snackball.config.AppProperties;
 import me.cho.snackball.settings.location.*;
-import me.cho.snackball.settings.studyTag.StudyTag;
+import me.cho.snackball.settings.location.domain.Location;
+import me.cho.snackball.settings.location.domain.UserLocation;
+import me.cho.snackball.settings.studyTag.domain.StudyTag;
 import me.cho.snackball.user.domain.User;
-import me.cho.snackball.settings.studyTag.UserStudyTag;
+import me.cho.snackball.settings.studyTag.domain.UserStudyTag;
 import me.cho.snackball.global.security.CustomUserDetails;
 import me.cho.snackball.settings.notification.UpdateNotificationsForm;
 import me.cho.snackball.settings.password.UpdatePasswordForm;
@@ -17,10 +23,11 @@ import me.cho.snackball.settings.studyTag.StudyTagRepository;
 import me.cho.snackball.settings.studyTag.UserStudyTagRepository;
 import me.cho.snackball.user.dto.SignupForm;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.MessageSourceAware;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +36,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -39,6 +48,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -47,8 +57,11 @@ public class UserService {
     private final LocationRepository locationRepository;
     private final UserLocationRepository userLocationRepository;
     private final JavaMailSender javaMailSender;
+    private final TemplateEngine templateEngine;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
+    private final AppProperties appProperties;
+    private final MessageSourceAware messageSourceAware;
 
     @PostConstruct
     public void initLocationData() throws IOException {
@@ -63,28 +76,43 @@ public class UserService {
         }
     }
 
-    public User processNewAccount(SignupForm signUpForm) {
+/*    public User processNewUser(SignupForm signUpForm) {
         User newUser = saveUser(signUpForm);
-        newUser.generateEmailCheckToken();
         sendSignUpConfirmEmail(newUser);
         return newUser;
-    }
+    }*/
 
-    private User saveUser(SignupForm signUpForm) {
+    public User saveUser(SignupForm signUpForm) {
         User user = User.createUser(signUpForm, passwordEncoder.encode(signUpForm.getPassword()));
         return userRepository.save(user);
     }
 
-    private void sendSignUpConfirmEmail(User newUser) {
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(newUser.getUsername());
-        mailMessage.setSubject("스낵볼, 회원 가입 인증");
-        mailMessage.setText("/check-email-token?token=" + newUser.getEmailCheckToken() + "&email=" + newUser.getUsername());
-        javaMailSender.send(mailMessage);
+    public void sendSignUpConfirmEmail(User user) {
+        user.genToken();
+
+        Context context = new Context();
+        context.setVariable("nickname", user.getNickname());
+        context.setVariable("message1", "SNACKBALL의 회원이 되셨습니다. 회원님의 ID는 " + user.getUsername() +"입니다.");
+        context.setVariable("message2", "이메일 주소를 인증하려면 링크 클릭:");
+        context.setVariable("host", appProperties.getHost());
+        context.setVariable("link", "/checkemailtoken?token=" + user.getEmailCheckToken() + "&email=" + user.getUsername());
+        String htmlMessage = templateEngine.process("mail/simpleLink", context);
+
+
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+            mimeMessageHelper.setTo(user.getUsername());
+            mimeMessageHelper.setSubject("SNACKBALL 이메일 인증");
+            mimeMessageHelper.setText(htmlMessage, true);
+            javaMailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            log.error("#####인증 이메일 전송 실패", e);
+        }
     }
 
     public void completeSignUp(User user, HttpServletRequest request) {
-        user.completeSignUp(); //TODO 반영 되나?? 안될 거 같은데
+        user.completeSignUp();
         login(user, request);
     }
 
@@ -100,6 +128,30 @@ public class UserService {
         // 세션에 SecurityContext 저장
         HttpSession session = request.getSession(true);
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+    }
+
+
+    public void sendLoginLink(User user) {
+        user.genToken();
+
+        Context context = new Context();
+        context.setVariable("nickname", user.getNickname());
+        context.setVariable("message1", "SNACKBALL의 ID " + user.getUsername() + "로 로그인 링크를 요청하셨습니다.");
+        context.setVariable("message2", "로그인하려면 링크 클릭:");
+        context.setVariable("host", appProperties.getHost());
+        context.setVariable("link", "/loginbyemail?token=" + user.getEmailCheckToken() + "&email=" + user.getUsername());
+        String htmlMessage = templateEngine.process("mail/simpleLink", context);
+
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+            mimeMessageHelper.setTo(user.getUsername());
+            mimeMessageHelper.setSubject("SNACKBALL 로그인");
+            mimeMessageHelper.setText(htmlMessage, true);
+            javaMailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            log.error("#####인증 이메일 전송 실패", e);
+        }
     }
 
     public void updateProfile(User user, UpdateProfileForm updateProfileForm) {
@@ -138,11 +190,6 @@ public class UserService {
         }
     }
 
-    public Set<UserStudyTag> getUserStudyTags(User user) {
-        User findUser = userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
-        return findUser.getUserStudyTags();
-    }
-
     public void removeUserStudyTag(User user, UserStudyTag userStudyTag) {
         User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
 
@@ -150,9 +197,9 @@ public class UserService {
         userStudyTagRepository.delete(userStudyTag);
     }
 
-    public Set<UserLocation> getUserLocations(User user) {
+    public Set<UserStudyTag> getUserStudyTags(User user) {
         User findUser = userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
-        return findUser.getUserLocations();
+        return findUser.getUserStudyTags();
     }
 
     public void addLocation(User user, Location location) {
@@ -174,5 +221,10 @@ public class UserService {
 
         findUser.getUserLocations().remove(userLocation);
         userLocationRepository.delete(userLocation);
+    }
+
+    public Set<UserLocation> getUserLocations(User user) {
+        User findUser = userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+        return findUser.getUserLocations();
     }
 }

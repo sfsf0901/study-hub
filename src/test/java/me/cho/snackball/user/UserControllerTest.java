@@ -1,5 +1,6 @@
 package me.cho.snackball.user;
 
+import jakarta.mail.internet.MimeMessage;
 import me.cho.snackball.user.domain.Authority;
 import me.cho.snackball.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
@@ -7,13 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
@@ -66,6 +67,9 @@ class UserControllerTest {
     @Test
     @DisplayName("POST /signup - 회원 가입 입력값 정상")
     void signUpSubmitTest() throws Exception {
+        MimeMessage mimeMessage = org.mockito.Mockito.mock(MimeMessage.class);
+        given(javaMailSender.createMimeMessage()).willReturn(mimeMessage);
+
         // 누락되거나 잘못된 입력값을 포함한 요청 시뮬레이션
         mockMvc.perform(post("/signup")
                         .param("nickname", "cho") // 빈 값 (필수 필드 누락)
@@ -80,7 +84,7 @@ class UserControllerTest {
         assertNotEquals("12345678", user.getPassword());
 
         assertTrue(userRepository.existsByUsername("cho@test.com"));
-        then(javaMailSender).should().send(any(SimpleMailMessage.class));
+        then(javaMailSender).should().send(any(MimeMessage.class));
     }
 
     @Test
@@ -104,7 +108,7 @@ class UserControllerTest {
         user.setNickname("testuser");
         user.setAuthority(Authority.ROLE_USER);
         User newUser = userRepository.save(user);
-        newUser.generateEmailCheckToken();
+        newUser.genToken();
 
         mockMvc.perform(get("/checkemailtoken")
                 .param("token", newUser.getEmailCheckToken())

@@ -1,4 +1,4 @@
-package me.cho.snackball.settings.studyTag;
+package me.cho.snackball.settings.studyTag.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

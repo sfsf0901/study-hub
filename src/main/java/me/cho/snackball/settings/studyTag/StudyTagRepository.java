@@ -1,5 +1,6 @@
 package me.cho.snackball.settings.studyTag;
 
+import me.cho.snackball.settings.studyTag.domain.StudyTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 

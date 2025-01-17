@@ -40,7 +40,7 @@ class MainControllerTest {
         signupForm.setUsername("testuser@test.com");
         signupForm.setNickname("testuser");
         signupForm.setPassword("12345678");
-        userService.processNewAccount(signupForm);
+        userService.saveUser(signupForm);
     }
 
     @AfterEach

@@ -5,6 +5,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.cho.snackball.user.domain.User;
 import me.cho.snackball.global.security.CurrentUser;
+import me.cho.snackball.user.dto.EmailLoginForm;
+import me.cho.snackball.user.dto.LoginForm;
 import me.cho.snackball.user.dto.Profile;
 import me.cho.snackball.user.dto.SignupForm;
 import org.springframework.stereotype.Controller;
@@ -12,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,7 +43,9 @@ public class UserController {
             return "user/signup";
         }
 
-        User user = userService.processNewAccount(signupForm);
+//        User user = userService.processNewUser(signupForm);
+        User user = userService.saveUser(signupForm);
+        userService.sendSignUpConfirmEmail(user);
         userService.login(user, request);
         return "redirect:/";
     }
@@ -63,6 +68,46 @@ public class UserController {
 
         model.addAttribute("numberOfUser", userRepository.count());
         model.addAttribute("nickname", user.getNickname());
+        return view;
+    }
+
+    @GetMapping("/login")
+    public String login(Model model) {
+        model.addAttribute(new LoginForm());
+        return "user/login";
+    }
+
+    @GetMapping("/emaillogin")
+    public String emailLoginForm(Model model) {
+        model.addAttribute("emailLoginForm", new EmailLoginForm());
+        return "user/emailLogin";
+    }
+
+    @PostMapping("/emaillogin")
+    public String emailLoginLink(@Valid EmailLoginForm emailLoginForm, BindingResult bindingResult, Model model, RedirectAttributes attributes) {
+        User user = userRepository.findByUsername(emailLoginForm.getUsername()).orElse(null);
+        if (user == null) {
+            model.addAttribute("error", "존재하지 않는 회원입니다.");
+            return "user/emailLogin";
+        }
+
+        userService.sendLoginLink(user);
+        attributes.addFlashAttribute("message", "로그인 링크를 이메일로 발송했습니다.");
+        return "redirect:/emaillogin";
+    }
+
+    @GetMapping("/loginbyemail")
+    public String loginByEmail(String token, String email, Model model, HttpServletRequest request) {
+        String view = "user/loggedInByEmail";
+
+        User user = userRepository.findByUsername(email).orElse(null);
+        if (user == null || !user.isValidToken(token)) {
+            model.addAttribute("error", "로그인할 수 없습니다.");
+            return view;
+        }
+
+        userService.login(user, request);
+//        userService.deleteToken(user);
         return view;
     }
 

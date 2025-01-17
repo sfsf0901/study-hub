@@ -25,7 +25,7 @@ public class WithUserSecurityContextFactory implements WithSecurityContextFactor
         signupForm.setUsername(username);
         signupForm.setNickname("testuser");
         signupForm.setPassword("12345678");
-        userService.processNewAccount(signupForm);
+        userService.saveUser(signupForm);
 
         UserDetails principle = userDetailsService.loadUserByUsername(username);
         Authentication authentication = new UsernamePasswordAuthenticationToken(principle, principle.getPassword(), principle.getAuthorities());

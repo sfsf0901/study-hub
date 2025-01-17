@@ -1,6 +1,6 @@
 package me.cho.snackball.settings.location;
 
-import me.cho.snackball.settings.SettingsController;
+import me.cho.snackball.settings.location.domain.Location;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

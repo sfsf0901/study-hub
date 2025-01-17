@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SNACKBALL</title>
+</head>
+<body>
+  <div>
+    <h2>SNACKBALL</h2>
+    <br>
+
+    <p><span th:text="${nickname}"></span> 님, </p>
+    <p th:text="${message1}"></p>
+    <br>
+
+    <p th:text="${message2}"></p>
+    <a th:href="${host + link}" th:text="${host + link}">이메일 인증 링크</a>
+    <br>
+
+    <p><strong>참고</strong>: 링크를 통해 액세스할 수 없는 경우에는 전체 URL을 복사하여 브라우저의 주소창에 붙여 넣으십시오.</p>
+    <br>
+
+    <footer>
+      <p>SNACKBALL© 2024</p>
+    </footer>
+  </div>
+</body>
+</html>

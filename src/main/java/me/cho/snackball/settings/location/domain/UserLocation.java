@@ -1,10 +1,8 @@
-package me.cho.snackball.settings.location;
+package me.cho.snackball.settings.location.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import me.cho.snackball.settings.studyTag.StudyTag;
-import me.cho.snackball.settings.studyTag.UserStudyTag;
 import me.cho.snackball.user.domain.User;
 
 @Entity
