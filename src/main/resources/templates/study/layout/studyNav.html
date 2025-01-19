@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="studyNav">
+    <title>Study Navigation</title>
+    <style>
+        .nav-link.active {
+            color: black !important; /* 활성화된 메뉴는 파란색 */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <ul th:fragment="studyNav(currentMenu)" class="nav nav-underline">
+        <li class="nav-item">
+            <a th:classappend="${currentMenu == 'info'} ? 'active'" th:href="@{/study/{id}(id=${study.id})}" class="nav-link fs-5 text-dark" aria-current="true">스터디</a>
+        </li>
+        <li class="nav-item">
+            <a th:classappend="${currentMenu == 'members'} ? 'active'" th:href="@{/study/{id}/members(id=${study.id})}" class="nav-link fs-5 text-dark" aria-current="true">멤버</a>
+        </li>
+        <li class="nav-item">
+            <a th:classappend="${currentMenu == 'study'} ? 'active'" th:href="@{/study/{id}/study(id=${study.id})}" class="nav-link fs-5 text-dark" aria-current="true">모임</a>
+        </li>
+    </ul>
+
+</body>
+</html>

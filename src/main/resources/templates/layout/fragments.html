@@ -8,11 +8,12 @@
     <title>SNACKBALL</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/node_modules/font-awesome/css/font-awesome.css" />
-<!--    <link rel="stylesheet" href="/node_modules/font-awesome/css/font-awesome.min.css">-->
     <link rel="stylesheet" href="/node_modules/@yaireo/tagify/dist/tagify.css">
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/node_modules/@yaireo/tagify/dist/tagify.js"></script>
     <script src="/node_modules/jquery/dist/jquery.js"></script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/node_modules/summernote/dist/summernote-bs5.min.css">
+    <script src="/node_modules/summernote/dist/summernote-bs5.min.js"></script>
+    <script src="/node_modules/@yaireo/tagify/dist/tagify.js"></script>
 
 
     <!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">-->
@@ -84,8 +85,8 @@
                 </li>
 
                 <li class="nav-item me-2" sec:authorize="isAuthenticated()">
-                    <a class="btn btn-outline-primary" th:href="@{/notifications}">
-                        <i class="fa fa-plus" aria-hidden="true"></i> 스터디 만들기
+                    <a class="btn btn-outline-primary" th:href="@{/study/create}">
+                        스터디 만들기
                     </a>
                 </li>
                 <li class="nav-item" sec:authorize="isAuthenticated()">

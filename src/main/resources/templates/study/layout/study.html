@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:fragment="study">
+    <title>Profile</title>
+</head>
+
+<body>
+    <div th:fragment="study" class="container">
+        <div class="row">
+            <div class="my-2">
+                <span th:if="${!study.published}" class="badge text-bg-light">준비중</span>
+                <span th:if="${study.closed}" class="badge text-bg-dark">종료</span>
+                <span th:if="${!study.closed && study.published && study.recruiting}" class="badge text-bg-primary">모집중</span>
+                <span th:if="${!study.closed && study.published && !study.recruiting}" class="badge text-bg-dark">모집마감</span>
+            </div>
+
+            <div class="d-flex align-items-center mb-3">
+                <a th:href="@{/study/{id}(id=${study.id})}" class="text-decoration-none d-flex align-items-center">
+                    <span class="h1 mb-0 me-2" th:text="${study.title}">스터디 이름</span>
+                </a>
+            </div>
+
+            <div class="tags mb-5">
+                <div>
+                    <span th:each="studyTag : ${study.studyStudyTags}" class="badge rounded-pill text-bg-info me-1">
+                        <a>#
+                            <span th:text="${studyTag.name}">Tag Name</span>
+                        </a>
+                    </span>
+                </div>
+                <div>
+                    <span th:each="studyLocation : ${study.studyLocations}" class="badge rounded-pill text-bg-primary me-1">
+                        <a>#
+                            <span th:text="${studyLocation.city}">Tag Name</span>
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="studyInfo">
+                <p th:each="manager : ${study.managers}">
+                    <span class="me-2" style="font-size: 20px;"><i class="fa-solid fa-chalkboard-user"></i></span>
+                    <span class="me-1 text-muted">매니저</span>
+                    <span th:text="${manager.user.nickname}" class="col-11 text-muted"></span>
+                </p>
+                <p>
+                    <span class="me-2" style="font-size: 20px;"><i class="fa-solid fa-users"></i></span>
+                    <span class="me-1 text-muted">멤버</span>
+                    <span th:text="${study.members.size}" class="col-11 me-1 text-muted"></span>
+                    <span class="text-muted">명</span>
+                </p>
+                <p th:if="${!#strings.isEmpty(study.publishedDate)}">
+                    <span style="font-size: 20px;"><i class="fa-regular fa-calendar"></i></i></span>
+                    <span class="me-1 text-muted">시작일</span>
+                    <span th:text="${study.publishedDate}" class="col-11 text-muted"></span>
+                </p>
+                <p th:if="${!#strings.isEmpty(study.closedDate)}">
+                    <span style="font-size: 20px;"><i class="fa-regular fa-calendar"></i></span>
+                    <span class="me-1 text-muted">종료일</span>
+                    <span th:text="${study.closedDate}" class="col-11 text-muted"></span>
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="text-center">
+                <div class="mb-2">
+                    <span sec:authorize="isAuthenticated()" th:if="${!study.closed && isManager}">
+                        <a class="btn btn-primary d-grid" th:href="@{/study/update}" role="button">스터디 수정</a>
+                    </span>
+                </div>
+                <span sec:authorize="isAuthenticated()" th:if="${!study.closed && isManager}">
+                    <a class="btn btn-outline-primary d-grid" th:href="@{/study/update}" role="button">스터디 종료</a>
+                </span>
+                <span sec:authorize="isAuthenticated()" th:if="${!study.closed && !isManager && !isMember}">
+                    <a class="btn btn-primary d-grid" th:href="@{/study/}" role="button">스터디 가입</a>
+                </span>
+                <span sec:authorize="isAuthenticated()" th:if="${!study.closed && !isManager && isMember}">
+                    <a class="btn btn-primary d-grid" th:href="@{/study/}" role="button">스터디 탈퇴</a>
+                </span>
+
+                <div th:if="${study.closed}">
+                    <button type="button" class="btn btn-outline-primary d-grid" disabled>이 스터디는 종료되었습니다</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

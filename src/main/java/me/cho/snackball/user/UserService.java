@@ -11,6 +11,7 @@ import me.cho.snackball.config.AppProperties;
 import me.cho.snackball.settings.location.*;
 import me.cho.snackball.settings.location.domain.Location;
 import me.cho.snackball.settings.location.domain.UserLocation;
+import me.cho.snackball.settings.studyTag.StudyTagService;
 import me.cho.snackball.settings.studyTag.domain.StudyTag;
 import me.cho.snackball.user.domain.User;
 import me.cho.snackball.settings.studyTag.domain.UserStudyTag;
@@ -53,6 +54,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final StudyTagRepository studyTagRepository;
+    private final StudyTagService studyTagService;
     private final UserStudyTagRepository userStudyTagRepository;
     private final LocationRepository locationRepository;
     private final UserLocationRepository userLocationRepository;
@@ -172,11 +174,7 @@ public class UserService {
     public void addStudyTag(User user, UpdateStudyTagsForm updateStudyTagsForm) {
         User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
 
-        StudyTag studyTag = studyTagRepository.findByName(updateStudyTagsForm.getTagName()).orElse(null);
-
-        if (studyTag == null) {
-            studyTag = studyTagRepository.save(StudyTag.builder().name(updateStudyTagsForm.getTagName()).build());
-        }
+        StudyTag studyTag = studyTagService.createStudyTag(updateStudyTagsForm.getTagName());
 
         boolean duplicate = false;
         for (UserStudyTag userStudyTag : findUser.getUserStudyTags()) {
@@ -185,8 +183,8 @@ public class UserService {
             }
         }
         if (!duplicate) {
+            //TODO cascade = CascadeType.ALL 때문에 save 안해 됨
             UserStudyTag.createUserStudyTag(findUser, studyTag);
-            //TODO save 안해도 저장되네???
         }
     }
 
