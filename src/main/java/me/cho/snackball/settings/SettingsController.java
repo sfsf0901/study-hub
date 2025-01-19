@@ -47,10 +47,12 @@ public class SettingsController {
     private final UserService userService;
     private final StudyTagRepository studyTagRepository;
     private final UserStudyTagRepository userStudyTagRepository;
+    private final StudyTagService studyTagService;
     private final LocationRepository locationRepository;
+    private final UserLocationRepository userLocationRepository;
+    private final LocationService locationService;
     private final ModelMapper modelMapper;
     private final NicknameValidator nicknameValidator;
-    private final UserLocationRepository userLocationRepository;
 
     @InitBinder("updatePasswordForm")
     public void passwordInitBinder(WebDataBinder binder) {
@@ -130,9 +132,7 @@ public class SettingsController {
 
     @GetMapping(URL_STUDY_TAGS)
     public String updateStudyTagsForm(@CurrentUser User user, Model model) {
-//        model.addAttribute(user);
-        List<StudyTag> studyTags = studyTagRepository.findAll();
-        model.addAttribute("studyTags", studyTags.stream().map(StudyTag::getName).collect(Collectors.toList()));
+        model.addAttribute("studyTags", studyTagService.getStudyTagNames());
 
         Set<UserStudyTag> userStudyTags = userService.getUserStudyTags(user);
         model.addAttribute("userStudyTags", userStudyTags.stream().map(UserStudyTag::getName).collect(Collectors.toList()));
@@ -169,12 +169,7 @@ public class SettingsController {
 
     @GetMapping(URL_LOCATIONS)
     public String updateLocationsForm(@CurrentUser User user, Model model) {
-        List<Location> locations = locationRepository.findAll();
-        model.addAttribute("locations",
-                locations.stream()
-                        .sorted(Comparator.comparing(Location::getProvince).thenComparing(Location::getCity))
-                        .map(Location::toString)
-                        .collect(Collectors.toList()));
+        model.addAttribute("locations", locationService.getLocationNames());
 
         Set<UserLocation> userLocations = userService.getUserLocations(user);
         model.addAttribute("userLocations",

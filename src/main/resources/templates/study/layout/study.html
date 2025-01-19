@@ -44,13 +44,13 @@
             <div class="studyInfo">
                 <p th:each="manager : ${study.managers}">
                     <span class="me-2" style="font-size: 20px;"><i class="fa-solid fa-chalkboard-user"></i></span>
-                    <span class="me-1 text-muted">매니저</span>
+                    <span class="me-1 text-muted">관리자</span>
                     <span th:text="${manager.user.nickname}" class="col-11 text-muted"></span>
                 </p>
                 <p>
                     <span class="me-2" style="font-size: 20px;"><i class="fa-solid fa-users"></i></span>
                     <span class="me-1 text-muted">멤버</span>
-                    <span th:text="${study.members.size}" class="col-11 me-1 text-muted"></span>
+                    <span th:text="${study.members.size + 1}" class="col-11 me-1 text-muted"></span>
                     <span class="text-muted">명</span>
                 </p>
                 <p th:if="${!#strings.isEmpty(study.publishedDate)}">
@@ -70,7 +70,7 @@
             <div class="text-center">
                 <div class="mb-2">
                     <span sec:authorize="isAuthenticated()" th:if="${!study.closed && isManager}">
-                        <a class="btn btn-primary d-grid" th:href="@{/study/update}" role="button">스터디 수정</a>
+                        <a class="btn btn-primary d-grid" th:href="@{/study/{id}/update(id=${study.id})}" role="button">스터디 수정</a>
                     </span>
                 </div>
                 <span sec:authorize="isAuthenticated()" th:if="${!study.closed && isManager}">

@@ -13,6 +13,7 @@ import me.cho.snackball.settings.location.domain.Location;
 import me.cho.snackball.settings.location.domain.UserLocation;
 import me.cho.snackball.settings.studyTag.StudyTagService;
 import me.cho.snackball.settings.studyTag.domain.StudyTag;
+import me.cho.snackball.study.domain.StudyStudyTag;
 import me.cho.snackball.user.domain.User;
 import me.cho.snackball.settings.studyTag.domain.UserStudyTag;
 import me.cho.snackball.global.security.CustomUserDetails;
@@ -173,19 +174,27 @@ public class UserService {
 
     public void addStudyTag(User user, UpdateStudyTagsForm updateStudyTagsForm) {
         User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+        Set<UserStudyTag> userStudyTags = findUser.getUserStudyTags();
 
-        StudyTag studyTag = studyTagService.createStudyTag(updateStudyTagsForm.getTagName());
+        StudyTag studyTag = studyTagService.createOrFindStudyTag(updateStudyTagsForm.getTagName());
 
-        boolean duplicate = false;
-        for (UserStudyTag userStudyTag : findUser.getUserStudyTags()) {
-            if (userStudyTag.getStudyTag().getId().equals(studyTag.getId())) {
-                duplicate = true;
-            }
-        }
-        if (!duplicate) {
+        boolean exists = userStudyTags.stream()
+                .anyMatch(userStudyTag -> userStudyTag.getStudyTag().getId().equals(studyTag.getId()));
+        if (!exists) {
             //TODO cascade = CascadeType.ALL 때문에 save 안해 됨
             UserStudyTag.createUserStudyTag(findUser, studyTag);
         }
+
+//        boolean duplicate = false;
+//        for (UserStudyTag userStudyTag : findUser.getUserStudyTags()) {
+//            if (userStudyTag.getStudyTag().getId().equals(studyTag.getId())) {
+//                duplicate = true;
+//            }
+//        }
+//        if (!duplicate) {
+//            //TODO cascade = CascadeType.ALL 때문에 save 안해 됨
+//            UserStudyTag.createUserStudyTag(findUser, studyTag);
+//        }
     }
 
     public void removeUserStudyTag(User user, UserStudyTag userStudyTag) {
@@ -203,13 +212,18 @@ public class UserService {
     public void addLocation(User user, Location location) {
         User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
 
-        boolean duplicate = false;
-        for (UserLocation userLocation : findUser.getUserLocations()) {
-            if (userLocation.getId().equals(location.getId())) {
-                duplicate = true;
-            }
-        }
-        if (!duplicate) {
+        Set<UserLocation> userLocations = findUser.getUserLocations();
+
+//        boolean duplicate = false;
+//        for (UserLocation userLocation : findUser.getUserLocations()) {
+//            if (userLocation.getId().equals(location.getId())) {
+//                duplicate = true;
+//            }
+//        }
+//
+        boolean exists = userLocations.stream()
+                .anyMatch(userLocation -> userLocation.getLocation().getId().equals(location.getId()));
+        if (!exists) {
             UserLocation.createUserLocation(findUser, location);
         }
     }

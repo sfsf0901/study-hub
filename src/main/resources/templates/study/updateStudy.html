@@ -11,11 +11,11 @@
 
     <div class="container py-5 ">
         <div class="text-center mb-5">
-            <h2>스터디 만들기</h2>
+            <h2>스터디 수정하기</h2>
         </div>
 
         <div class="row justify-content-center">
-            <form class="needs-validation col-sm-10" th:action="@{/study/create}" th:object="${createStudyForm}" method="post" novalidate>
+            <form class="needs-validation col-sm-10" th:action="@{/study/{id}/update(id=${updateStudyForm.studyId})}" th:object="${updateStudyForm}" method="post" novalidate>
                 <div class="form-group mb-3">
                     <label for="title" class="mb-2">제목</label>
                     <input id="title" name="title" type="text" th:field="*{title}" class="form-control"
@@ -27,13 +27,13 @@
                 <div class="form-group">
                     <label for="whitelist1" class="mb-2">태그</label>
                     <div id="whitelist1" th:text="${#strings.listJoin(studyTags, ',')}" hidden></div>
-                    <input type="text" name="inputStudyTags"
+                    <input type="text" name="inputStudyTags" th:value="${#strings.listJoin(updateStudyForm.studyTags,',')}"
                            class="tagify--outside form-control mb-2" aria-describedby="tagHelp" placeholder="키워드를 입력하세요"/>
                     <input type="hidden" name="studyTags" id="studyTags">
                 </div>
                 <div class="form-group mb-3">
                     <div id="whitelist2" th:text="${#strings.listJoin(locations, ',')}" hidden></div>
-                    <input type="text" name="inputLocations"
+                    <input type="text" name="inputLocations" th:value="${#strings.listJoin(updateStudyForm.locations,',')}"
                            class="tagify--outside form-control mb-2" aria-describedby="tagHelp" placeholder="활동 지역을 입력하세요"/>
                     <input type="hidden" name="locations" id="locations">
                 </div>

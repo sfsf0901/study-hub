@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="~{layout/fragments.html :: head}"></head>
+
+<body>
+    <div th:replace="~{layout/fragments.html :: main-nav}"></div>
+
+    <div class="container">
+        <div class="row justify-content-center my-5">
+            <div class="col-3 me-5">
+                <div th:replace="~{study/layout/study.html :: study}"></div>
+            </div>
+
+            <div class="col-7">
+                <div class="row">
+                    <div th:replace="~{study/layout/studyNav.html :: studyNav(currentMenu='members')}"></div>
+                </div>
+                <div class="row  justify-content-center my-5 mx-2">
+                    <div th:each="manager : ${members.getManagerNicknames()}" class="d-flex align-items-center">
+                        <a th:href="@{/profile/{nickname}(nickname=${manager})}" class="h5 mb-0 me-2 text-decoration-none text-dark link-primary">
+                            <strong th:text="${manager}">관리자 이름</strong>
+                        </a>
+                        <span class="badge text-bg-primary">관리자</span>
+                    </div>
+                    <div th:each="member : ${members.getMemberNicknames()}" class="d-flex align-items-center">
+                        <span th:text="${member}" class="h5 text-decoration-none text-dark link-primary">멤버 이름</span>
+                    </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
