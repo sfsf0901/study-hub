@@ -108,6 +108,20 @@ public class StudyService {
                         studyLocation.getLocation().equals(foundLocation)));
     }
 
+    public void updatePublishedStatus(User user, Long studyId, Boolean isPublished) {
+        Study study = getStudyToUpdate(user, studyId);
+        study.setPublished(isPublished);
+        //TODO 일단 이렇게 두고 나중에 수정하자
+        study.setRecruiting(true);
+    }
+
+    public void updateClosedStatus(User user, Long studyId, Boolean isClosed) {
+        Study study = getStudyToUpdate(user, studyId);
+        study.setClosed(isClosed);
+        study.setPublished(false);
+        study.setRecruiting(false);
+    }
+
     public Study getStudyToUpdate(User user, Long studyId) {
         Study study = findStudyById(studyId);
         if (!isStudyManager(user, study)) {
@@ -125,6 +139,7 @@ public class StudyService {
         StudyManager studyManager = studyManagerRepository.findByStudyAndUser(study, user);
         return study.getManagers().contains(studyManager);
     }
+
 
     public boolean isStudyMember(User user, Study study) {
         StudyMember studyMember = studyMemberRepository.findByStudyAndUser(study, user);

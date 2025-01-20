@@ -12,21 +12,18 @@ import me.cho.snackball.settings.studyTag.StudyTagService;
 import me.cho.snackball.settings.studyTag.domain.StudyTag;
 import me.cho.snackball.settings.studyTag.domain.UserStudyTag;
 import me.cho.snackball.study.domain.*;
-import me.cho.snackball.study.dto.CreateStudyForm;
-import me.cho.snackball.study.dto.UpdateStudyForm;
-import me.cho.snackball.study.dto.ViewMembers;
-import me.cho.snackball.study.dto.ViewStudy;
+import me.cho.snackball.study.dto.*;
 import me.cho.snackball.user.domain.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -132,5 +129,54 @@ public class StudyController {
 
         model.addAttribute("members", new ViewMembers(study));
         return "study/viewMembers";
+    }
+
+    @GetMapping("/study/{studyId}/settings")
+    public String updateStudyStatusForm(@PathVariable("studyId") Long studyId,
+                                  @CurrentUser User user,
+                                  Model model) {
+        Study study = studyService.getStudyToUpdate(user, studyId);
+        model.addAttribute("study", new ViewStudy(study));
+
+        StudyManager studyManager = studyManagerRepository.findByStudyAndUser(study, user);
+        boolean isManager = study.getManagers().contains(studyManager);
+        model.addAttribute("isManager", isManager);
+
+        StudyMember studyMember = studyMemberRepository.findByStudyAndUser(study, user);
+        boolean isMember = study.getMembers().contains(studyMember);
+        model.addAttribute("isMember", isMember);
+
+        model.addAttribute(new UpdateStudyStatusForm(study));
+        return "study/viewSettings";
+    }
+
+    @PostMapping("/study/{studyId}/updatePublished")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> updatePublishedStatus(@PathVariable Long studyId,
+                                                                     @RequestBody Map<String, Boolean> request,
+                                                                     @CurrentUser User user) {
+        Boolean isPublished = request.get("published");
+        if (isPublished == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid payload"));
+        }
+
+        studyService.updatePublishedStatus(user, studyId, isPublished);
+
+        return ResponseEntity.ok(Map.of("message", "스터디 상태가 업데이트되었습니다."));
+    }
+
+    @PostMapping("/study/{studyId}/updateClosed")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> updateClosedStatus(@PathVariable Long studyId,
+                                                                  @RequestBody Map<String, Boolean> request,
+                                                                  @CurrentUser User user) {
+        Boolean isClosed = request.get("closed");
+        if (isClosed == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid payload"));
+        }
+
+        studyService.updateClosedStatus(user, studyId, isClosed);
+
+        return ResponseEntity.ok(Map.of("message", "스터디 종료 상태가 업데이트되었습니다."));
     }
 }

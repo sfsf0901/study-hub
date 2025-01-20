@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<meta name="_csrf" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+
+<head th:replace="~{layout/fragments.html :: head}"></head>
+
+<body>
+    <div th:replace="~{layout/fragments.html :: main-nav}"></div>
+
+    <div class="container">
+        <div class="row justify-content-center my-5">
+            <div class="col-3 me-5">
+                <div th:replace="~{study/layout/study.html :: study}"></div>
+            </div>
+
+            <div class="col-7">
+                <div class="row">
+                    <div th:replace="~{study/layout/studyNav.html :: studyNav(currentMenu='settings')}"></div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="row justify-content-center my-5 mx-2" th:object="${updateStudyStatusForm}">
+                        <div class="alert alert-light" role="alert">
+                            <span>스터디를 공개할 준비가 되셨나요.</span>
+                        </div>
+                        <div class="d-flex align-items-center" sec:authorize="isAuthenticated()" th:if="${!study.closed && isManager}">
+                            <div class="form-check form-switch me-4" th:attr="data-study-id=${study.id}">
+                                <label class="custom-control-label" for="publishedAndNotClosed">스터디 공개</label>
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       th:field="*{published}" id="publishedAndNotClosed"
+                                       onchange="updatePublishedStatus(this.checked, this.closest('[data-study-id]').getAttribute('data-study-id'))">
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center" sec:authorize="isAuthenticated()" th:if="${study.closed && isManager}">
+                            <div class="form-check form-switch me-4">
+                                <label class="custom-control-label" for="publishedAndClosed">스터디 공개</label>
+                                <input class="form-check-input" type="checkbox" role="switch" th:field="*{published}" id="publishedAndClosed" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="row justify-content-center my-5 mx-2" th:object="${updateStudyStatusForm}">
+                        <div class="alert alert-light" role="alert">
+                            <span>스터디를 종료하면 다시 활성화할 수 없으니 주의하세요.</span>
+                        </div>
+                        <div class="d-flex align-items-center" sec:authorize="isAuthenticated()" th:if="${!study.closed && isManager}">
+                            <div class="form-check form-switch me-4" th:attr="data-study-id=${study.id}">
+                                <label class="custom-control-label" for="Notclosed">스터디 종료</label>
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       th:field="*{closed}" id="Notclosed"
+                                       onchange="updateClosedStatus(this.checked, this.closest('[data-study-id]').getAttribute('data-study-id'))">
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center" sec:authorize="isAuthenticated()" th:if="${study.closed && isManager}">
+                            <div class="form-check form-switch me-4">
+                                <label class="custom-control-label" for="closed">스터디 종료</label>
+                                <input class="form-check-input" type="checkbox" role="switch" th:field="*{closed}" id="closed" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="row justify-content-center my-5 mx-2" th:object="${updateStudyStatusForm}">
+                        <div class="alert alert-danger" role="alert">
+                            <span>스터디를 삭제하면 스터디와 관련된 모든 기록이 함께 삭제되며 복구할 수 없습니다.</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <a th:href="@{/study/{id}/delete(id=${study.id})}" class="btn btn-outline-danger">삭제하기</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updatePublishedStatus(isPublished, studyId) {
+            console.log("Study ID:", studyId); // 디버깅용 로그
+
+            if (!studyId) {
+                console.error("Study ID is missing!");
+                alert("스터디 ID가 누락되었습니다. 관리자에게 문의하세요.");
+                return;
+            }
+
+            // 활성화 또는 비활성화 확인 메시지 표시
+            const userConfirmed = confirm(
+                isPublished
+                    ? "스터디를 공개하시겠습니까?" // 활성화 시 메시지
+                    : "스터디를 비공개로 전환하시겠습니까?" // 비활성화 시 메시지
+            );
+
+            if (!userConfirmed) {
+                // 사용자가 취소를 선택하면 체크박스 상태를 이전 상태로 되돌림
+                document.getElementById('publishedAndNotClosed').checked = !isPublished;
+                return;
+            }
+
+            const url = `/study/${studyId}/updatePublished`;
+            console.log("Request URL:", url);
+
+            // Fetch 요청
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+                },
+                body: JSON.stringify({ published: isPublished })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update study status');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Update successful:', data);
+                    location.reload(); // 상태 업데이트 후 새로고침
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('스터디 상태를 업데이트하는 중 문제가 발생했습니다.');
+                });
+        }
+    </script>
+    <script>
+        function updateClosedStatus(isClosed, studyId) {
+            console.log("Study ID:", studyId); // 디버깅용 로그
+
+            if (!studyId) {
+                console.error("Study ID is missing!");
+                alert("스터디 ID가 누락되었습니다. 관리자에게 문의하세요.");
+                return;
+            }
+
+            // 종료를 확인하는 confirm 창
+            const userConfirmed = confirm(
+                "스터디를 종료하시겠습니까? 종료 후에는 다시 활성화할 수 없습니다."
+            );
+
+            if (!userConfirmed) {
+                console.log("사용자가 취소를 선택했습니다.");
+                // 사용자가 취소를 선택하면 체크박스 상태를 이전 상태로 되돌림
+                document.getElementById('Notclosed').checked = false;
+                return;
+            }
+
+            const url = `/study/${studyId}/updateClosed`;
+            console.log("Request URL:", url);
+
+            // Fetch 요청
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+                },
+                body: JSON.stringify({ closed: isClosed })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update study status');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 종료 상태로 변경된 경우, 체크박스를 비활성화
+                    if (isClosed) {
+                        document.getElementById('Notclosed').disabled = true;
+                    }
+                    location.reload(); // 상태 업데이트 후 새로고침
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('스터디 종료 상태를 업데이트하는 중 문제가 발생했습니다.');
+                    // 오류 발생 시 체크박스 상태 복구
+                    document.getElementById('Notclosed').checked = false;
+                });
+        }
+
+    </script>
+
+</body>
+</html>

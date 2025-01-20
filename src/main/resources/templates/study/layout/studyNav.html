@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head th:fragment="studyNav">
     <title>Study Navigation</title>
     <style>
@@ -21,8 +22,8 @@
         <li class="nav-item">
             <a th:classappend="${currentMenu == 'study'} ? 'active'" th:href="@{/study/{id}/study(id=${study.id})}" class="nav-link fs-5 text-dark" aria-current="true">모임</a>
         </li>
-        <li class="nav-item">
-            <a th:classappend="${currentMenu == 'study'} ? 'active'" th:href="@{/study/{id}/settings(id=${study.id})}" class="nav-link fs-5 text-dark" aria-current="true">설정</a>
+        <li class="nav-item" sec:authorize="isAuthenticated()" th:if="${isManager}">
+            <a th:classappend="${currentMenu == 'settings'} ? 'active'" th:href="@{/study/{id}/settings(id=${study.id})}" class="nav-link fs-5 text-dark" aria-current="true">설정</a>
         </li>
     </ul>
 
