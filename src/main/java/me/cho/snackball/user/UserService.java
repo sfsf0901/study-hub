@@ -41,7 +41,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
@@ -70,14 +73,19 @@ public class UserService {
     public void initLocationData() throws IOException {
         if (locationRepository.count() == 0) {
             Resource resource = new ClassPathResource("location_kr.csv");
-            List<Location> locations = Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8).stream()
-                    .map(line -> {
-                        String[] parts = line.split(",");
-                        return Location.builder().province(parts[0]).city(parts[1]).build();
-                    }).toList();
-            locationRepository.saveAll(locations);
+
+            try (InputStream inputStream = resource.getInputStream();
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+                List<Location> locations = reader.lines()
+                        .map(line -> {
+                            String[] parts = line.split(",");
+                            return Location.builder().province(parts[0]).city(parts[1]).build();
+                        }).toList();
+                locationRepository.saveAll(locations);
+            }
         }
     }
+
 
 /*    public User processNewUser(SignupForm signUpForm) {
         User newUser = saveUser(signUpForm);
