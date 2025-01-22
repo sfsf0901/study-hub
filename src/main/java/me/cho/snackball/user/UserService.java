@@ -167,19 +167,19 @@ public class UserService {
     }
 
     public void updateProfile(User user, UpdateProfileForm updateProfileForm, HttpServletRequest request) {
-        User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+        user.setNickname(updateProfileForm.getNickname());
+        user.setOccupation(updateProfileForm.getOccupation());
+        user.setCompany(updateProfileForm.getCompany());
+        user.setUrl(updateProfileForm.getUrl());
+        user.setDescription(updateProfileForm.getDescription());
+        User savedUser = userRepository.save(user);
 
-        findUser.setNickname(updateProfileForm.getNickname());
-        findUser.setOccupation(updateProfileForm.getOccupation());
-        findUser.setCompany(updateProfileForm.getCompany());
-        findUser.setUrl(updateProfileForm.getUrl());
-        findUser.setDescription(updateProfileForm.getDescription());
-
-        if (updateProfileForm.getImageFile() != null) {
-            String imageUrl = s3Service.uploadImage(updateProfileForm.getImageFile(), findUser);
-            findUser.setProfileImage(imageUrl);
-            login(findUser, request);
+        if (!updateProfileForm.getImageFile().isEmpty()) {
+            String imageUrl = s3Service.uploadImage(updateProfileForm.getImageFile(), savedUser);
+            savedUser.setProfileImage(imageUrl);
+            login(savedUser, request);
         }
+
     }
 
     public void updatePassword(User user, UpdatePasswordForm updatePasswordForm) {

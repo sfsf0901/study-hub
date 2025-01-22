@@ -70,7 +70,7 @@ public class SettingsController {
     public String updateProfileForm(@CurrentUser User user, Model model) {
 
         model.addAttribute("profileImg", user.getProfileImage());
-        model.addAttribute("updateProfileForm", modelMapper.map(user, UpdateProfileForm.class));
+        model.addAttribute("updateProfileForm", new UpdateProfileForm(user));
         return VIEW_PROFILE;
     }
 
@@ -85,7 +85,7 @@ public class SettingsController {
             return VIEW_PROFILE;
         }
 
-        System.out.println("updateProfileForm.getImageFile() = " + updateProfileForm.getImageFile());
+        System.out.println("updateProfileForm.getImageFile().isEmpty() = " + updateProfileForm.getImageFile().isEmpty());
         userService.updateProfile(user, updateProfileForm, request);
         redirectAttributes.addFlashAttribute("message", "프로필을 수정했습니다.");
         return "redirect:" + URL_PROFILE;

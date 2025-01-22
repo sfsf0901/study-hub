@@ -12,7 +12,7 @@ public class MainController {
 
     @GetMapping("/")
     public String home(@CurrentUser User user, Model model) {
-        model.addAttribute("profileImg", user.getProfileImage());
+//        model.addAttribute("profileImg", user.getProfileImage());
         return "index";
     }
 
