@@ -2,9 +2,11 @@ package me.cho.snackball.settings.profile;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -28,4 +30,8 @@ public class UpdateProfileForm {
     private String description;
 
     private String profileImage;
+
+//    @Size(max = 5 * 1024 * 1024, message = "파일 크기는 최대 5MB까지 가능합니다.")
+//    @Pattern(regexp = "([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)", message = "이미지 파일만 업로드 가능합니다.")
+    private MultipartFile imageFile;
 }

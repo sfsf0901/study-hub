@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.cho.snackball.config.AppProperties;
+import me.cho.snackball.global.s3.S3Service;
 import me.cho.snackball.settings.location.*;
 import me.cho.snackball.settings.location.domain.Location;
 import me.cho.snackball.settings.location.domain.UserLocation;
@@ -57,7 +58,6 @@ import java.util.Set;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final StudyTagRepository studyTagRepository;
     private final StudyTagService studyTagService;
     private final UserStudyTagRepository userStudyTagRepository;
     private final LocationRepository locationRepository;
@@ -67,7 +67,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final AppProperties appProperties;
-    private final MessageSourceAware messageSourceAware;
+    private final S3Service s3Service;
 
     @PostConstruct
     public void initLocationData() throws IOException {
@@ -94,7 +94,8 @@ public class UserService {
     }*/
 
     public User saveUser(SignupForm signUpForm) {
-        User user = User.createUser(signUpForm, passwordEncoder.encode(signUpForm.getPassword()));
+        String imgUrl = "https://snackball-static-files.s3.ap-northeast-2.amazonaws.com/54eec2d7-6382-44bb-a8f3-5cc28ae1ecb6_AnonymousProfileImg.png";
+        User user = User.createUser(signUpForm, passwordEncoder.encode(signUpForm.getPassword()), imgUrl);
         return userRepository.save(user);
     }
 
@@ -165,9 +166,20 @@ public class UserService {
         }
     }
 
-    public void updateProfile(User user, UpdateProfileForm updateProfileForm) {
-        modelMapper.map(updateProfileForm, user);
-        userRepository.save(user);
+    public void updateProfile(User user, UpdateProfileForm updateProfileForm, HttpServletRequest request) {
+        User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+
+        findUser.setNickname(updateProfileForm.getNickname());
+        findUser.setOccupation(updateProfileForm.getOccupation());
+        findUser.setCompany(updateProfileForm.getCompany());
+        findUser.setUrl(updateProfileForm.getUrl());
+        findUser.setDescription(updateProfileForm.getDescription());
+
+        if (updateProfileForm.getImageFile() != null) {
+            String imageUrl = s3Service.uploadImage(updateProfileForm.getImageFile(), findUser);
+            findUser.setProfileImage(imageUrl);
+            login(findUser, request);
+        }
     }
 
     public void updatePassword(User user, UpdatePasswordForm updatePasswordForm) {

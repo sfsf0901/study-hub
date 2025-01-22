@@ -2,7 +2,9 @@
 <html lang="en"
         xmlns:th="http://www.thymeleaf.org"
         xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
-<head th:replace="~{layout/fragments.html :: head}"></head>
+<head th:replace="~{layout/fragments.html :: head}">
+
+</head>
 
 <body>
     <div th:replace="~{layout/fragments.html :: main-nav}"></div>
@@ -21,18 +23,34 @@
                             <h3 class="card-title">PROFILE</h3>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="card-body">
-                            <svg class="rounded-circle border bg-light" width="125" height="125"></svg>
-                        </div>
-                    </div>
-
 
                     <div class="row d-flex flex-md-row flex-column">
                         <div class="card-body">
                             <!-- 입력 폼 -->
                             <div style="max-width: 500px;">
-                                <form th:action="@{/settings/profile}" th:object="${updateProfileForm}" method="post" novalidate>
+                                <form th:action="@{/settings/profile}" th:object="${updateProfileForm}" method="post" enctype="multipart/form-data" novalidate>
+
+                                    <div class="form-group mb-4">
+                                        <!-- 프로필 이미지 -->
+                                        <img id="profileImagePreview"
+                                             th:src="*{profileImage}"
+                                             width="125" height="125" class="rounded-circle border mb-3"
+                                             alt="Profile Image"
+                                             onclick="document.getElementById('profileImageUpload').click(); return false;"
+                                             style="cursor: pointer;"/>
+
+                                        <!-- 이미지 변경 링크 -->
+                                        <div>
+                                            <a href="#" style="text-decoration: none;" onclick="document.getElementById('profileImageUpload').click(); return false;">
+                                                <i class="fa-regular fa-pen-to-square"></i>
+                                                이미지 변경
+                                            </a>
+                                        </div>
+
+                                        <!-- 숨겨진 파일 입력창 -->
+                                        <input id="profileImageUpload" type="file" name="imageFile" style="display: none;" accept="image/*"
+                                               onchange="previewImage(this)"/>
+                                    </div>
 
                                     <div class="form-group mb-3">
                                         <label for="nickname" class="card-subtitle mb-2 text-body-secondary h6">닉네임</label>
@@ -63,7 +81,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <button class="btn btn-primary btn-block mt-2" type="submit">수정하기</button>
+                                        <button class="btn btn-primary btn-block mt-2" type="submit">저장</button>
                                     </div>
                                 </form>
 
@@ -101,6 +119,26 @@
                 })
             }, false)
         }())
+    </script>
+
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+
+                // FileReader 객체 생성
+                const reader = new FileReader();
+
+                // 이미지가 로드되었을 때 실행될 함수 정의
+                reader.onload = function (e) {
+                    const imgElement = document.getElementById('profileImagePreview');
+                    imgElement.src = e.target.result; // 이미지 데이터를 미리보기로 설정
+                };
+
+                // 파일 읽기 (Data URL로 읽음)
+                reader.readAsDataURL(file);
+            }
+        }
     </script>
 </body>
 </html>

@@ -4,32 +4,40 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import me.cho.snackball.user.domain.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.UUID;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
+@Slf4j
 @Profile("!test")
 public class S3Service {
 
     private final AmazonS3 amazonS3;
+    private static final String IMAGE_URL = "https://snackball-static-files.s3.ap-northeast-2.amazonaws.com/54eec2d7-6382-44bb-a8f3-5cc28ae1ecb6_AnonymousProfileImg.png";
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-//    public S3Service(AmazonS3 amazonS3) {
-//        this.amazonS3 = amazonS3;
-//    }
-
     /**
      * S3에 이미지 업로드 하기
      */
-    public String uploadImage(MultipartFile image) throws IOException {
+    public String uploadImage(MultipartFile image, User user) {
+
+        // 기존 이미지 삭제
+        if (user.getProfileImage() != null && !user.getProfileImage().equals(IMAGE_URL)) {
+            amazonS3.deleteObject(bucket, extractObjectKey(user.getProfileImage()));
+        }
+
         String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename(); // 고유한 파일 이름 생성
 
         // 메타데이터 설정
@@ -38,12 +46,24 @@ public class S3Service {
         metadata.setContentLength(image.getSize());
 
         // S3에 파일 업로드 요청 생성
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, fileName, image.getInputStream(), metadata);
+        PutObjectRequest putObjectRequest;
+        try{
+            putObjectRequest = new PutObjectRequest(bucket, fileName, image.getInputStream(), metadata);
+        } catch (IOException e) {
+            log.error("IOException 발생: {}", e.getMessage(), e);
+            //TODO 예외 만들기
+            throw new RuntimeException("이미지 업로드 중 서버 오류가 발생했습니다.", e);
+        }
 
         // S3에 파일 업로드
         amazonS3.putObject(putObjectRequest);
 
         return getPublicUrl(fileName);
+    }
+
+    private String extractObjectKey(String imageUrl) {
+        // URL 형식: https://{bucket-name}.s3.{region}.amazonaws.com/{object-key}
+        return imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
     }
 
     private String getPublicUrl(String fileName) {

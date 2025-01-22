@@ -1,5 +1,6 @@
 package me.cho.snackball.settings;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.cho.snackball.settings.location.*;
@@ -68,6 +69,7 @@ public class SettingsController {
     @GetMapping(URL_PROFILE)
     public String updateProfileForm(@CurrentUser User user, Model model) {
 
+        model.addAttribute("profileImg", user.getProfileImage());
         model.addAttribute("updateProfileForm", modelMapper.map(user, UpdateProfileForm.class));
         return VIEW_PROFILE;
     }
@@ -77,13 +79,14 @@ public class SettingsController {
                                 @Valid UpdateProfileForm updateProfileForm,
                                 BindingResult bindingResult,
                                 Model model,
-                                RedirectAttributes redirectAttributes) {
+                                RedirectAttributes redirectAttributes,
+                                HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
-//            model.addAttribute("updateProfileForm", updateProfileForm);
             return VIEW_PROFILE;
         }
 
-        userService.updateProfile(user, updateProfileForm);
+        System.out.println("updateProfileForm.getImageFile() = " + updateProfileForm.getImageFile());
+        userService.updateProfile(user, updateProfileForm, request);
         redirectAttributes.addFlashAttribute("message", "프로필을 수정했습니다.");
         return "redirect:" + URL_PROFILE;
     }

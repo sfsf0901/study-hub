@@ -50,7 +50,7 @@ public class User extends BaseEntity {
 
     private String company;
 
-    @Lob @Basic(fetch = FetchType.EAGER)
+//    @Lob @Basic(fetch = FetchType.EAGER)
     private String profileImage;
 
     private boolean studyCreatedByEmail;
@@ -74,12 +74,13 @@ public class User extends BaseEntity {
     private Set<UserLocation> userLocations = new HashSet<>();
 
 
-    public static User createUser(SignupForm signUpForm, String password) {
+    public static User createUser(SignupForm signUpForm, String password, String imgUrl) {
         User user = new User();
         user.setUsername(signUpForm.getUsername());
         user.setNickname(signUpForm.getNickname());
         user.setPassword(password);
         user.setAuthority(Authority.ROLE_USER);
+        user.setProfileImage(imgUrl);
         user.setStudyCreatedByWeb(true);
         user.setStudyEnrollmentResultByWeb(true);
         user.setStudyUpdatedByWeb(true);
