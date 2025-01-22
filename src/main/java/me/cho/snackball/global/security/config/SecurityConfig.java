@@ -40,11 +40,11 @@ public class SecurityConfig {
         //인가 설정
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+//                                "/s3/**",
                                 "/node_modules/**",
                                 "/signup", "/login", "/",
                                 "/checkemailtoken",
                                 "/emaillogin", "/checkemaillogin", "/loginlink", "/loginbyemail"
-//                                "/node_modules/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/profile/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
@@ -63,7 +63,7 @@ public class SecurityConfig {
                 .userDetailsService(userDetailsService)
                 .tokenRepository(tokenRepository()));
 
-        //        http.csrf(AbstractHttpConfigurer::disable);
+//                http.csrf(AbstractHttpConfigurer::disable);
 
         http.cors((corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
 

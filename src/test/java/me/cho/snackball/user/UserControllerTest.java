@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc //필터, 시큐리티 포함
+@ActiveProfiles("test")
 //@WebMvcTest(AccountController.class) //필터, 시큐리티 미포함, 컨트롤러 계층만 로드
 class UserControllerTest {
 

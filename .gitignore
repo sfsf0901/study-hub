@@ -42,4 +42,5 @@ node_modules/
 
 ### Ignore ###
 application.properties
+application-test.properties
 MailConfig.java
