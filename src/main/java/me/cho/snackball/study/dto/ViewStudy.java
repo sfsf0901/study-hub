@@ -4,6 +4,7 @@ import lombok.Data;
 import me.cho.snackball.study.domain.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -11,15 +12,15 @@ public class ViewStudy {
 
     private Long id;
 
-    private Set<StudyManager> managers;
+    private List<StudyManager> managers;
 
-    private Set<StudyMember> members;
+    private List<StudyMember> members;
 
     private String title;
 
-    private Set<StudyStudyTag> studyStudyTags;
+    private List<StudyStudyTag> studyStudyTags;
 
-    private Set<StudyLocation> studyLocations;
+    private List<StudyLocation> studyLocations;
 
     private String shortDescription;
 

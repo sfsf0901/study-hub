@@ -194,7 +194,7 @@ public class UserService {
 
     public void addStudyTag(User user, UpdateStudyTagsForm updateStudyTagsForm) {
         User findUser = findUser(user.getId());
-        Set<UserStudyTag> userStudyTags = findUser.getUserStudyTags();
+        List<UserStudyTag> userStudyTags = findUser.getUserStudyTags();
 
         StudyTag studyTag = studyTagService.createOrFindStudyTag(updateStudyTagsForm.getTagName());
 
@@ -224,14 +224,14 @@ public class UserService {
         userStudyTagRepository.delete(userStudyTag);
     }
 
-    public Set<UserStudyTag> getUserStudyTags(User user) {
+    public List<UserStudyTag> getUserStudyTags(User user) {
         return findUser(user.getId()).getUserStudyTags();
     }
 
     public void addLocation(User user, Location location) {
         User findUser = findUser(user.getId());
 
-        Set<UserLocation> userLocations = findUser.getUserLocations();
+        List<UserLocation> userLocations = findUser.getUserLocations();
 
 //        boolean duplicate = false;
 //        for (UserLocation userLocation : findUser.getUserLocations()) {
@@ -254,7 +254,7 @@ public class UserService {
         userLocationRepository.delete(userLocation);
     }
 
-    public Set<UserLocation> getUserLocations(User user) {
+    public List<UserLocation> getUserLocations(User user) {
         return findUser(user.getId()).getUserLocations();
     }
 

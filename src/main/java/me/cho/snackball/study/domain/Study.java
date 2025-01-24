@@ -6,7 +6,9 @@ import me.cho.snackball.global.BaseUserEntity;
 import me.cho.snackball.study.dto.CreateStudyForm;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -18,10 +20,10 @@ public class Study extends BaseUserEntity {
     private Long id;
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL)
-    private Set<StudyManager> managers = new HashSet<>();
+    private List<StudyManager> managers = new ArrayList<>();
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL)
-    private Set<StudyMember> members = new HashSet<>();
+    private List<StudyMember> members = new ArrayList<>();
 
     @Column(unique = true)
     private String path;
@@ -37,10 +39,10 @@ public class Study extends BaseUserEntity {
 //    private String image;
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL)
-    private Set<StudyStudyTag> studyStudyTags = new HashSet<>();
+    private List<StudyStudyTag> studyStudyTags = new ArrayList<>();
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL)
-    private Set<StudyLocation> studyLocations = new HashSet<>();
+    private List<StudyLocation> studyLocations = new ArrayList<>();
 
     //추가
     private int limitOfEnrollment;

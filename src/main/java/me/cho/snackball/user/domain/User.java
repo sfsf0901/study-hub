@@ -8,9 +8,7 @@ import me.cho.snackball.global.BaseEntity;
 import me.cho.snackball.user.dto.SignupForm;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -66,12 +64,12 @@ public class User extends BaseEntity {
     private boolean studyUpdatedByWeb;
 
 //    @ManyToMany
-//    private Set<Tag> tags;
+//    private List<Tag> tags;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<UserStudyTag> userStudyTags = new HashSet<>();
+    private List<UserStudyTag> userStudyTags = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<UserLocation> userLocations = new HashSet<>();
+    private List<UserLocation> userLocations = new ArrayList<>();
 
 
     public static User createUser(SignupForm signUpForm, String password, String imgUrl) {

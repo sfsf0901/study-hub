@@ -137,7 +137,7 @@ public class SettingsController {
     public String updateStudyTagsForm(@CurrentUser User user, Model model) {
         model.addAttribute("studyTags", studyTagService.getStudyTagNames());
 
-        Set<UserStudyTag> userStudyTags = userService.getUserStudyTags(user);
+        List<UserStudyTag> userStudyTags = userService.getUserStudyTags(user);
         model.addAttribute("userStudyTags", userStudyTags.stream().map(UserStudyTag::getName).collect(Collectors.toList()));
         return VIEW_STUDY_TAGS;
     }
@@ -174,7 +174,7 @@ public class SettingsController {
     public String updateLocationsForm(@CurrentUser User user, Model model) {
         model.addAttribute("locations", locationService.getLocationNames());
 
-        Set<UserLocation> userLocations = userService.getUserLocations(user);
+        List<UserLocation> userLocations = userService.getUserLocations(user);
         model.addAttribute("userLocations",
                 userLocations.stream()
                         .sorted(Comparator.comparing(UserLocation::getProvince).thenComparing(UserLocation::getCity))

@@ -68,7 +68,7 @@ public class StudyService {
 
     private void updateStudyTagsAndStudyStudyTags(List<String> studyTagNames, Study study) {
 
-        Set<StudyStudyTag> studyStudyTags = study.getStudyStudyTags();
+        List<StudyStudyTag> studyStudyTags = study.getStudyStudyTags();
         for (String name : studyTagNames) {
             StudyTag studyTag = studyTagService.createOrFindStudyTag(name);
 
@@ -87,7 +87,7 @@ public class StudyService {
 
     private void updateStudyLocations(List<String> locationNames, Study study) {
         List<Location> foundLocations = new ArrayList<>();
-        Set<StudyLocation> studyLocations = study.getStudyLocations();
+        List<StudyLocation> studyLocations = study.getStudyLocations();
         for (String name : locationNames) {
             String province = name.substring(0, name.indexOf(" / "));
             String city = name.substring(name.indexOf(" / ") + 3);

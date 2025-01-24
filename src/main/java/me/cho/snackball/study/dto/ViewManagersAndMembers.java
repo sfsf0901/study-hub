@@ -5,14 +5,15 @@ import me.cho.snackball.study.domain.Study;
 import me.cho.snackball.study.domain.StudyManager;
 import me.cho.snackball.study.domain.StudyMember;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
 public class ViewManagersAndMembers {
 
-    private Set<StudyManager> managers;
+    private List<StudyManager> managers;
 
-    private Set<StudyMember> members;
+    private List<StudyMember> members;
 
     public ViewManagersAndMembers(Study study) {
         this.managers = study.getManagers();
