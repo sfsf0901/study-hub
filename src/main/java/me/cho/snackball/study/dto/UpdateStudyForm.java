@@ -27,12 +27,18 @@ public class UpdateStudyForm {
     @NotBlank
     private String fullDescription;
 
+    @NotBlank
+    @Length(max = 1000)
+    private int limitOfEnrollment;
+
+
     public UpdateStudyForm(Study study, List<String> studyStudyTagNames, List<String> studyLocationNames) {
         this.studyId = study.getId();
         this.title = study.getTitle();
         this.studyTags = studyStudyTagNames;
         this.locations = studyLocationNames;
         this.fullDescription = study.getFullDescription();
+        this.limitOfEnrollment = study.getLimitOfEnrollment();
     }
 
 }

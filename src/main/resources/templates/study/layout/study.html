@@ -2,6 +2,8 @@
 <html lang="en"
         xmlns:th="http://www.thymeleaf.org"
         xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<meta name="_csrf" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
 <head th:fragment="study">
     <title>Profile</title>
 </head>
@@ -43,25 +45,31 @@
         <div class="row mb-4">
             <div class="studyInfo">
                 <p th:each="manager : ${study.managers}">
-                    <span class="me-2" style="font-size: 20px;"><i class="fa-solid fa-chalkboard-user"></i></span>
+                    <small>&nbsp;</small>
+                    <span class="me-2" style="font-size: 20px;"><i class="fa-regular fa-user"></i></span>
                     <span class="me-1 text-muted">관리자</span>
                     <span th:text="${manager.user.nickname}" class="col-11 text-muted"></span>
                 </p>
                 <p>
-                    <span class="me-2" style="font-size: 20px;"><i class="fa-solid fa-users"></i></span>
+                    <small>&nbsp;</small>
+                    <span class="me-2" style="font-size: 20px;"><i class="fa-solid fa-user"></i></span>
                     <span class="me-1 text-muted">멤버</span>
-                    <span th:text="${study.members.size + 1}" class="col-11 me-1 text-muted"></span>
+                    <span th:text="${activeMemberCount + 1}" class="col-11 me-1 text-muted"></span>
+                    <span class="text-muted">/</span>
+                    <span th:text="${study.limitOfEnrollment}" class="col-11 me-1 text-muted"></span>
                     <span class="text-muted">명</span>
                 </p>
                 <p th:if="${!#strings.isEmpty(study.publishedDate)}">
-                    <span style="font-size: 20px;"><i class="fa-regular fa-calendar"></i></i></span>
+                    <small>&nbsp;</small>
+                    <span style="font-size: 20px;"><i class="fa-regular fa-calendar"></i></span>
+                    <small>&nbsp;</small>
                     <span class="me-1 text-muted">시작일</span>
-                    <span th:text="${study.publishedDate}" class="col-11 text-muted"></span>
+                    <span th:text="${#temporals.format(study.publishedDate, 'yyyy-MM-dd')}" class="col-11 text-muted"></span>
                 </p>
                 <p th:if="${!#strings.isEmpty(study.closedDate)}">
                     <span style="font-size: 20px;"><i class="fa-regular fa-calendar"></i></span>
                     <span class="me-1 text-muted">종료일</span>
-                    <span th:text="${study.closedDate}" class="col-11 text-muted"></span>
+                    <span th:text="${#temporals.format(study.closedDate, 'yyyy-MM-dd')}" class="col-11 text-muted"></span>
                 </p>
             </div>
         </div>
@@ -73,23 +81,30 @@
                         <a class="btn btn-primary d-grid" th:href="@{/study/{id}/update(id=${study.id})}" role="button">스터디 수정</a>
                     </span>
                 </div>
-                <span sec:authorize="isAuthenticated()" th:if="${!study.closed && isManager}">
-                    <a class="btn btn-outline-primary d-grid" th:href="@{/study/update}" role="button">스터디 종료</a>
-                </span>
-                <span sec:authorize="isAuthenticated()" th:if="${!study.closed && !isManager && !isMember}">
-                    <a class="btn btn-primary d-grid" th:href="@{/study/}" role="button">스터디 가입</a>
-                </span>
-                <span sec:authorize="isAuthenticated()" th:if="${!study.closed && !isManager && isMember}">
-                    <a class="btn btn-primary d-grid" th:href="@{/study/}" role="button">스터디 탈퇴</a>
-                </span>
 
-                <div th:if="${study.closed}">
-                    <button type="button" class="btn btn-outline-primary d-grid" disabled>이 스터디는 종료되었습니다</button>
+                <form sec:authorize="isAuthenticated()" th:if="${!study.closed && study.recruiting && !isManager && !isMember}"
+                      th:action="@{/study/{id}/enroll/request(id=${study.id})}" method="post" novalidate>
+                    <button class="btn btn-primary w-100" type="submit" onclick="return confirm('스터디 가입 신청을 하시겠습니까?');">가입 신청</button>
+                </form>
+                <form sec:authorize="isAuthenticated()" th:if="${!study.closed && !isManager && isMember && !studyMember.active}"
+                      th:action="@{/study/{id}/enroll/cancel(id=${study.id})}" method="post" novalidate>
+                    <button class="btn btn-outline-primary w-100" type="submit" onclick="return confirm('스터디 가입 신청을 취소하시겠습니까?');">가입 신청 취소</button>
+                </form>
+
+                <form sec:authorize="isAuthenticated()" th:if="${!study.closed && !isManager && isMember && studyMember.active}"
+                      th:action="@{/study/{id}/withdrawal(id=${study.id})}" method="post" novalidate>
+                    <button class="btn btn-outline-primary w-100" type="submit" onclick="return confirm('정말로 스터디를 탈퇴하시겠습니까?');">스터디 탈퇴</button>
+                </form>
+
+                <div sec:authorize="isAuthenticated()" th:if="${!study.recruiting && !isManager}" class="alert alert-secondary" role="alert">
+                    멤버 모집중이 아닙니다.
+                </div>
+                <div sec:authorize="isAuthenticated()" th:if="${study.closed}" class="alert alert-secondary" role="alert">
+                    이 스터디는 종료되었습니다.
                 </div>
 
             </div>
         </div>
-
     </div>
 </body>
 </html>

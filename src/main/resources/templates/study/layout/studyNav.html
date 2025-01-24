@@ -20,10 +20,14 @@
             <a th:classappend="${currentMenu == 'members'} ? 'active'" th:href="@{/study/{id}/members(id=${study.id})}" class="nav-link fs-5 text-dark" aria-current="true">멤버</a>
         </li>
         <li class="nav-item">
-            <a th:classappend="${currentMenu == 'study'} ? 'active'" th:href="@{/study/{id}/study(id=${study.id})}" class="nav-link fs-5 text-dark" aria-current="true">모임</a>
+            <a th:classappend="${currentMenu == 'board'} ? 'active'" th:href="@{/study/{id}/board(id=${study.id})}" class="nav-link fs-5 text-dark" aria-current="true">게시판</a>
+        </li>
+
+        <li class="nav-item" sec:authorize="isAuthenticated()" th:if="${isManager}">
+            <a th:classappend="${currentMenu == 'memberSettings'} ? 'active'" th:href="@{/study/{id}/settings/member(id=${study.id})}" class="nav-link fs-5 text-dark" aria-current="true">멤버관리</a>
         </li>
         <li class="nav-item" sec:authorize="isAuthenticated()" th:if="${isManager}">
-            <a th:classappend="${currentMenu == 'settings'} ? 'active'" th:href="@{/study/{id}/settings(id=${study.id})}" class="nav-link fs-5 text-dark" aria-current="true">설정</a>
+            <a th:classappend="${currentMenu == 'studySettings'} ? 'active'" th:href="@{/study/{id}/settings/study(id=${study.id})}" class="nav-link fs-5 text-dark" aria-current="true">스터디관리</a>
         </li>
     </ul>
 

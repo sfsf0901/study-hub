@@ -28,19 +28,22 @@ public class Study extends BaseUserEntity {
 
     private String title;
 
-    private String shortDescription;
+//    private String shortDescription;
 
     @Lob @Basic(fetch = FetchType.EAGER)
     private String fullDescription;
 
-    @Lob @Basic(fetch = FetchType.EAGER)
-    private String image;
+//    @Lob @Basic(fetch = FetchType.EAGER)
+//    private String image;
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL)
     private Set<StudyStudyTag> studyStudyTags = new HashSet<>();
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL)
     private Set<StudyLocation> studyLocations = new HashSet<>();
+
+    //추가
+    private int limitOfEnrollment;
 
     private LocalDateTime publishedDate;
 
@@ -61,6 +64,7 @@ public class Study extends BaseUserEntity {
         study.setTitle(createStudyForm.getTitle());
 //        study.setShortDescription(createStudyForm.getShortDescription());
         study.setFullDescription(createStudyForm.getFullDescription());
+        study.setLimitOfEnrollment(createStudyForm.getLimitOfEnrollment());
         return study;
     }
 

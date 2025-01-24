@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="~{layout/fragments.html :: head}"></head>
+
+<body>
+    <div th:replace="~{layout/fragments.html :: main-nav}"></div>
+
+    <div class="container">
+        <div class="row justify-content-center my-5">
+            <div class="col-3 me-5">
+                <div th:replace="~{study/layout/study.html :: study}"></div>
+            </div>
+
+            <div class="col-7">
+                <div class="row mb-4">
+                    <div th:replace="~{study/layout/studyNav.html :: studyNav(currentMenu='memberSettings')}"></div>
+                </div>
+
+                <div class="row mx-1 mb-4">
+                    <div class="font-weight-light mb-2" style="margin: 0; padding: 0;"><strong>*가입 요청 (<span th:text="${pendingCount}"></span>)</strong></div>
+                    <table class="table table-borderless table-sm">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">회원</th>
+                            <th scope="col">요청일</th>
+                            <th scope="col">가입 상태</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                        <tr th:each="member : ${managersAndMembers.getMembers()}" th:if="${!member.active}">
+                            <th scope="row">▶︎</th>
+                            <td>
+                                <img th:src="${member.getUser().profileImage}"
+                                     width="35" height="35" class="rounded-circle border me-2"/>
+                                <a th:href="@{/profile/{nickname}(nickname=${member.getUser().getNickname()})}" class="h5 me-2 text-decoration-none text-dark link-primary">
+                                    <strong th:text="${member.getUser().getNickname()}">멤버 이름</strong>
+                                </a>
+                            </td>
+                            <td th:text="${#temporals.format(member.requestDate, 'yyyy-MM-dd')}"></td>
+                            <td th:text="${member.active ? '가입중' : '요청중'}"></td>
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Accept or Reject">
+                                    <form th:action="@{/study/{id}/enroll/accept(id=${study.id})}" method="post" novalidate>
+                                        <input type="hidden" name="studyMemberId" th:value="${member.id}" />
+                                        <button class="btn btn-primary btn-sm me-1" type="submit">수락</button>
+                                    </form>
+                                    <form th:action="@{/study/{id}/enroll/reject(id=${study.id})}" method="post" novalidate>
+                                        <input type="hidden" name="studyMemberId" th:value="${member.id}" />
+                                        <button class="btn btn-outline-primary btn-sm" type="submit">반려</button>
+                                    </form>
+                                </div>
+                            </td>
+
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div th:if="${pendingCount == 0}" class="alert alert-light" role="alert">
+                        가입 요청이 없습니다.
+                    </div>
+                    <div th:if="${result}">
+                        <span th:text="${result}" class="text-primary"></span>
+                    </div>
+                </div>
+                <br>
+
+                <div class="row mx-1 mb-4">
+                    <div class="font-weight-light mb-2" style="margin: 0; padding: 0;"><strong>*회원 목록 (<span th:text="${activeMemberCount}"></span>)</strong></div>
+                    <table class="table table-borderless table-sm">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">회원</th>
+                        <th scope="col">가입일</th>
+                        <th scope="col">가입 상태</th>
+                        <th scope="col"></th>
+                    </thead>
+                    <tbody class="table-group-divider">
+                    <tr th:each="member : ${managersAndMembers.getMembers()}" th:if="${member.active}">
+                        <th scope="row">▶︎</th>
+                        <td>
+                            <img th:src="${member.getUser().profileImage}"
+                                 width="35" height="35" class="rounded-circle border me-2"/>
+                            <a th:href="@{/profile/{nickname}(nickname=${member.getUser().getNickname()})}" class="h5 me-2 text-decoration-none text-dark link-primary">
+                                <strong th:text="${member.getUser().getNickname()}">멤버 이름</strong>
+                            </a>
+                        </td>
+                        <td th:text="${#temporals.format(member.activeDate, 'yyyy-MM-dd')}"></td>
+                        <td th:text="${member.active ? '가입중' : '요청중'}"></td>
+                        <td>
+                            <form th:action="@{/study/{id}/forcewithdrawal(id=${study.id})}" method="post" novalidate>
+                                <input type="hidden" name="studyMemberId" th:value="${member.id}" />
+                                <button class="btn btn-outline-primary btn-sm" type="submit">탈퇴</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                    </table>
+                    <div th:if="${memberCount == 0}" class="alert alert-light" role="alert">
+                        가입한 회원이 없습니다.
+                    </div>
+                </div>
+                <br>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

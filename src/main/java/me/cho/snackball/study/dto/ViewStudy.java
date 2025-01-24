@@ -1,12 +1,9 @@
 package me.cho.snackball.study.dto;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.OneToMany;
 import lombok.Data;
 import me.cho.snackball.study.domain.*;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -27,6 +24,8 @@ public class ViewStudy {
     private String shortDescription;
 
     private String fullDescription;
+
+    private int limitOfEnrollment;
 
     private LocalDateTime publishedDate;
 
@@ -49,8 +48,9 @@ public class ViewStudy {
         this.title = study.getTitle();
         this.studyStudyTags = study.getStudyStudyTags();
         this.studyLocations = study.getStudyLocations();
-        this.shortDescription = study.getShortDescription();
+//        this.shortDescription = study.getShortDescription();
         this.fullDescription = study.getFullDescription();
+        this.limitOfEnrollment = study.getLimitOfEnrollment();
         this.publishedDate = study.getPublishedDate();
         this.closedDate = study.getClosedDate();
         this.recruitingUpdatedDate = study.getRecruitingUpdatedDate();

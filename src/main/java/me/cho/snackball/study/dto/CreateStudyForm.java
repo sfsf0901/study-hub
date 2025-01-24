@@ -1,8 +1,6 @@
 package me.cho.snackball.study.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,5 +32,7 @@ public class CreateStudyForm {
     @NotBlank
     private String fullDescription;
 
-
+    @Min(1)
+    @Max(1000)
+    private int limitOfEnrollment;
 }

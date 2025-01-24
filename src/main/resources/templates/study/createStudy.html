@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout/fragments.html :: head}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
-</head>
+<head th:replace="~{layout/fragments.html :: head}"></head>
 
 <body>
     <div th:replace="~{layout/fragments.html :: main-nav}"></div>
@@ -47,8 +43,21 @@
 <!--                </div>-->
 
                 <div class="form-group mb-3">
+                    <label for="limitOfEnrollment" class="mb-2">회원수</label>
+                    <small class="form-text text-muted">(*가입 가능한 최대 회원수를 입력하세요)</small>
+                    <div class="d-flex align-items-center">
+                        <input id="limitOfEnrollment" type="number" name="limitOfEnrollment"
+                               th:field="*{limitOfEnrollment}" class="form-control show-spinner"
+                               style="text-align:center; max-width: 100px;" required min="1" max="1000"/>
+                        <span class="ms-2">명</span>
+                    </div>
+                    <small class="invalid-feedback">회원수를 1명 이상 입력해주세요.</small>
+                    <small class="form-text text-danger" th:errors="*{limitOfEnrollment}">LimitOfEnrollment Error</small>
+                </div>
+
+                <div class="form-group mb-3">
                     <label for="summernote" class="mb-2">소개</label>
-                    <textarea id="summernote" name="fullDescription" type="text" th:field="*{fullDescription}" class="form-control"
+                    <textarea id="summernote" name="fullDescription" th:field="*{fullDescription}" class="form-control"
                               aria-describedby="fullDescription" required></textarea>
                     <small class="invalid-feedback">스터디 내용을 입력하세요</small>
                     <small class="form-text text-danger" th:errors="*{fullDescription}">FullDescription Error</small>
@@ -56,7 +65,8 @@
 
                 <div class="form-group">
 <!--                    <button class="btn btn-primary btn-block mt-2" type="submit">취소</button>-->
-                    <button class="btn btn-primary btn-block mt-2" type="submit">등록</button>
+                    <button class="btn btn-primary btn-block mt-2" type="submit">저장</button>
+                    <a class="btn btn-outline-primary mt-2">취소</a>
                 </div>
 
             </form>

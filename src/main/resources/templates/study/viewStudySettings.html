@@ -18,7 +18,7 @@
 
             <div class="col-7">
                 <div class="row">
-                    <div th:replace="~{study/layout/studyNav.html :: studyNav(currentMenu='settings')}"></div>
+                    <div th:replace="~{study/layout/studyNav.html :: studyNav(currentMenu='studySettings')}"></div>
                 </div>
 
                 <div class="mb-4">
@@ -38,6 +38,28 @@
                             <div class="form-check form-switch me-4">
                                 <label class="custom-control-label" for="publishedAndClosed">스터디 공개</label>
                                 <input class="form-check-input" type="checkbox" role="switch" th:field="*{published}" id="publishedAndClosed" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="row justify-content-center my-5 mx-2" th:object="${updateStudyStatusForm}">
+                        <div class="alert alert-light" role="alert">
+                            <span>스터디 멤버를 모집할 준비가 되셨나요.</span>
+                        </div>
+                        <div class="d-flex align-items-center" sec:authorize="isAuthenticated()" th:if="${!study.closed && study.published && isManager}">
+                            <div class="form-check form-switch me-4" th:attr="data-study-id=${study.id}">
+                                <label class="custom-control-label" for="publishedAndNotClosed">멤버 모집</label>
+                                <input class="form-check-input" type="checkbox" role="switch"
+                                       th:field="*{recruiting}" id="recruitingAndNotClosed"
+                                       onchange="updateRecruitingStatus(this.checked, this.closest('[data-study-id]').getAttribute('data-study-id'))">
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center" sec:authorize="isAuthenticated()" th:if="${study.closed || !study.published && isManager}">
+                            <div class="form-check form-switch me-4">
+                                <label class="custom-control-label" for="publishedAndClosed">멤버 모집</label>
+                                <input class="form-check-input" type="checkbox" role="switch" th:field="*{recruiting}" id="recruitingAndClosed" disabled>
                             </div>
                         </div>
                     </div>
@@ -131,6 +153,59 @@
                 });
         }
     </script>
+
+    <script>
+        function updateRecruitingStatus(isRecruiting, studyId) {
+            console.log("Study ID:", studyId); // 디버깅용 로그
+
+            if (!studyId) {
+                console.error("Study ID is missing!");
+                alert("스터디 ID가 누락되었습니다. 관리자에게 문의하세요.");
+                return;
+            }
+
+            // 활성화 또는 비활성화 확인 메시지 표시
+            const userConfirmed = confirm(
+                isRecruiting
+                    ? "스터디 멤버 모집을 시작하시겠습니까?" // 활성화 시 메시지
+                    : "스터디 멤버 모집을 중단하시겠습니까?" // 비활성화 시 메시지
+            );
+
+            if (!userConfirmed) {
+                // 사용자가 취소를 선택하면 체크박스 상태를 이전 상태로 되돌림
+                document.getElementById('recruitingAndNotClosed').checked = !isRecruiting;
+                return;
+            }
+
+            const url = `/study/${studyId}/updateRecruiting`;
+            console.log("Request URL:", url);
+
+            // Fetch 요청
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+                },
+                body: JSON.stringify({ recruiting: isRecruiting })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update study status');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Update successful:', data);
+                    location.reload(); // 상태 업데이트 후 새로고침
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('스터디 상태를 업데이트하는 중 문제가 발생했습니다.');
+                });
+        }
+    </script>
+
     <script>
         function updateClosedStatus(isClosed, studyId) {
             console.log("Study ID:", studyId); // 디버깅용 로그
@@ -185,7 +260,6 @@
                     document.getElementById('Notclosed').checked = false;
                 });
         }
-
     </script>
 
 </body>

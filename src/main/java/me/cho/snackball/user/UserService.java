@@ -193,7 +193,7 @@ public class UserService {
     }
 
     public void addStudyTag(User user, UpdateStudyTagsForm updateStudyTagsForm) {
-        User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+        User findUser = findUser(user.getId());
         Set<UserStudyTag> userStudyTags = findUser.getUserStudyTags();
 
         StudyTag studyTag = studyTagService.createOrFindStudyTag(updateStudyTagsForm.getTagName());
@@ -218,19 +218,18 @@ public class UserService {
     }
 
     public void removeUserStudyTag(User user, UserStudyTag userStudyTag) {
-        User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+        User findUser = findUser(user.getId());
 
         findUser.getUserStudyTags().remove(userStudyTag);
         userStudyTagRepository.delete(userStudyTag);
     }
 
     public Set<UserStudyTag> getUserStudyTags(User user) {
-        User findUser = userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
-        return findUser.getUserStudyTags();
+        return findUser(user.getId()).getUserStudyTags();
     }
 
     public void addLocation(User user, Location location) {
-        User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+        User findUser = findUser(user.getId());
 
         Set<UserLocation> userLocations = findUser.getUserLocations();
 
@@ -249,14 +248,17 @@ public class UserService {
     }
 
     public void removeUserLocation(User user, UserLocation userLocation) {
-        User findUser = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
+        User findUser = findUser(user.getId());
 
         findUser.getUserLocations().remove(userLocation);
         userLocationRepository.delete(userLocation);
     }
 
     public Set<UserLocation> getUserLocations(User user) {
-        User findUser = userRepository.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다: " + user.getUsername()));
-        return findUser.getUserLocations();
+        return findUser(user.getId()).getUserLocations();
+    }
+
+    public User findUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다. userId: " + userId));
     }
 }

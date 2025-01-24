@@ -3,14 +3,8 @@ package me.cho.snackball.study;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.cho.snackball.global.security.CurrentUser;
-import me.cho.snackball.settings.location.LocationRepository;
 import me.cho.snackball.settings.location.LocationService;
-import me.cho.snackball.settings.location.domain.Location;
-import me.cho.snackball.settings.location.domain.UserLocation;
-import me.cho.snackball.settings.studyTag.StudyTagRepository;
 import me.cho.snackball.settings.studyTag.StudyTagService;
-import me.cho.snackball.settings.studyTag.domain.StudyTag;
-import me.cho.snackball.settings.studyTag.domain.UserStudyTag;
 import me.cho.snackball.study.domain.*;
 import me.cho.snackball.study.dto.*;
 import me.cho.snackball.user.domain.User;
@@ -19,13 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -35,8 +26,6 @@ public class StudyController {
     private final StudyService studyService;
     private final StudyManagerRepository studyManagerRepository;
     private final StudyMemberRepository studyMemberRepository;
-    private final StudyTagRepository studyTagRepository;
-    private final LocationRepository locationRepository;
     private final StudyTagService studyTagService;
     private final LocationService locationService;
 
@@ -52,8 +41,11 @@ public class StudyController {
     @PostMapping("/study/create")
     public String createStudy(@CurrentUser User user,
                               @Valid CreateStudyForm createStudyForm,
-                              BindingResult bindingResult) {
+                              BindingResult bindingResult,
+                              Model model) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("studyTags", studyTagService.getStudyTagNames());
+            model.addAttribute("locations", locationService.getLocationNames());
             return "study/createStudy";
         }
         Study study = studyService.createStudy(user, createStudyForm);
@@ -101,6 +93,11 @@ public class StudyController {
         //TODO 예외 만들기
         //TODO 한번에 조회하는 코드 짜기
         Study study = studyService.findStudyById(studyId);
+        if (!study.isPublished() && !studyService.isStudyManager(user, study)) {
+            throw new IllegalStateException("해당 스터디에 접근 권한이 없습니다. studyId: " + studyId);
+        }
+
+        model.addAttribute("profileImage", user.getProfileImage());
         model.addAttribute("study", new ViewStudy(study));
 
         boolean isManager = studyService.isStudyManager(user, study);
@@ -109,6 +106,12 @@ public class StudyController {
         boolean isMember = studyService.isStudyMember(user, study);
         model.addAttribute("isMember", isMember);
 
+        StudyMember studyMember = studyMemberRepository.findByStudyAndUser(study, user);
+        model.addAttribute("studyMember", studyMember);
+
+        int activeMemberCount = studyService.countActiveMember(study);
+        model.addAttribute("activeMemberCount", activeMemberCount);
+
         return "study/viewStudy";
     }
 
@@ -116,38 +119,50 @@ public class StudyController {
     public String viewStudyMembers(@PathVariable("studyId") Long studyId,
                             @CurrentUser User user,
                             Model model) {
-        Study study = studyRepository.findById(studyId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다. 스터디 id: " + studyId));
+        Study study = studyService.findStudyById(studyId);
+        if (!study.isPublished() && !studyService.isStudyManager(user, study)) {
+            throw new IllegalStateException("해당 스터디에 접근 권한이 없습니다. studyId: " + studyId);
+        }
+
+        model.addAttribute("profileImage", user.getProfileImage());
         model.addAttribute("study", new ViewStudy(study));
 
-        StudyManager studyManager = studyManagerRepository.findByStudyAndUser(study, user);
-        boolean isManager = study.getManagers().contains(studyManager);
+        boolean isManager = studyService.isStudyManager(user, study);
         model.addAttribute("isManager", isManager);
 
-        StudyMember studyMember = studyMemberRepository.findByStudyAndUser(study, user);
-        boolean isMember = study.getMembers().contains(studyMember);
+        boolean isMember = studyService.isStudyMember(user, study);
         model.addAttribute("isMember", isMember);
 
-        model.addAttribute("members", new ViewMembers(study));
+        StudyMember studyMember = studyMemberRepository.findByStudyAndUser(study, user);
+        model.addAttribute("studyMember", studyMember);
+
+        int activeMemberCount = studyService.countActiveMember(study);
+        model.addAttribute("activeMemberCount", activeMemberCount);
+
+        model.addAttribute("managersAndMembers", new ViewManagersAndMembers(study));
         return "study/viewMembers";
     }
 
-    @GetMapping("/study/{studyId}/settings")
+    @GetMapping("/study/{studyId}/settings/study")
     public String updateStudyStatusForm(@PathVariable("studyId") Long studyId,
                                   @CurrentUser User user,
                                   Model model) {
+        model.addAttribute("profileImage", user.getProfileImage());
+
         Study study = studyService.getStudyToUpdate(user, studyId);
         model.addAttribute("study", new ViewStudy(study));
 
-        StudyManager studyManager = studyManagerRepository.findByStudyAndUser(study, user);
-        boolean isManager = study.getManagers().contains(studyManager);
+        boolean isManager = studyService.isStudyManager(user, study);
         model.addAttribute("isManager", isManager);
 
-        StudyMember studyMember = studyMemberRepository.findByStudyAndUser(study, user);
-        boolean isMember = study.getMembers().contains(studyMember);
+        boolean isMember = studyService.isStudyMember(user, study);
         model.addAttribute("isMember", isMember);
 
+        int activeMemberCount = studyService.countActiveMember(study);
+        model.addAttribute("activeMemberCount", activeMemberCount);
+
         model.addAttribute(new UpdateStudyStatusForm(study));
-        return "study/viewSettings";
+        return "study/viewStudySettings";
     }
 
     @PostMapping("/study/{studyId}/updatePublished")
@@ -163,6 +178,21 @@ public class StudyController {
         studyService.updatePublishedStatus(user, studyId, isPublished);
 
         return ResponseEntity.ok(Map.of("message", "스터디 상태가 업데이트되었습니다."));
+    }
+
+    @PostMapping("/study/{studyId}/updateRecruiting")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> updateRecruitingStatus(@PathVariable Long studyId,
+                                                                     @RequestBody Map<String, Boolean> request,
+                                                                     @CurrentUser User user) {
+        Boolean isRecruiting = request.get("recruiting");
+        if (isRecruiting == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid payload"));
+        }
+
+        studyService.updateRecruitingStatus(user, studyId, isRecruiting);
+
+        return ResponseEntity.ok(Map.of("message", "스터디 멤버 모집 상태가 업데이트되었습니다."));
     }
 
     @PostMapping("/study/{studyId}/updateClosed")

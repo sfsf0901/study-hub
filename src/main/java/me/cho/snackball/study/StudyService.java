@@ -3,10 +3,8 @@ package me.cho.snackball.study;
 import lombok.RequiredArgsConstructor;
 import me.cho.snackball.settings.location.LocationRepository;
 import me.cho.snackball.settings.location.domain.Location;
-import me.cho.snackball.settings.location.domain.UserLocation;
 import me.cho.snackball.settings.studyTag.StudyTagService;
 import me.cho.snackball.settings.studyTag.domain.StudyTag;
-import me.cho.snackball.settings.studyTag.domain.UserStudyTag;
 import me.cho.snackball.study.domain.*;
 import me.cho.snackball.study.dto.CreateStudyForm;
 import me.cho.snackball.study.dto.UpdateStudyForm;
@@ -15,8 +13,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -111,8 +109,12 @@ public class StudyService {
     public void updatePublishedStatus(User user, Long studyId, Boolean isPublished) {
         Study study = getStudyToUpdate(user, studyId);
         study.setPublished(isPublished);
-        //TODO 일단 이렇게 두고 나중에 수정하자
-        study.setRecruiting(true);
+        study.setPublishedDate(LocalDateTime.now());
+    }
+
+    public void updateRecruitingStatus(User user, Long studyId, Boolean isRecruiting) {
+        Study study = getStudyToUpdate(user, studyId);
+        study.setRecruiting(isRecruiting);
     }
 
     public void updateClosedStatus(User user, Long studyId, Boolean isClosed) {
@@ -120,6 +122,7 @@ public class StudyService {
         study.setClosed(isClosed);
         study.setPublished(false);
         study.setRecruiting(false);
+        study.setClosedDate(LocalDateTime.now());
     }
 
     public Study getStudyToUpdate(User user, Long studyId) {
@@ -144,5 +147,74 @@ public class StudyService {
     public boolean isStudyMember(User user, Study study) {
         StudyMember studyMember = studyMemberRepository.findByStudyAndUser(study, user);
         return study.getMembers().contains(studyMember);
+    }
+
+    public void enrollmentRequest(Long studyId, User user) {
+        Study study = findStudyById(studyId);
+        StudyMember studyMember = StudyMember.create(user, study); //TODO 저장되나?
+    }
+
+    public void enrollmentCancel(Long studyId, User user) {
+        Study study = findStudyById(studyId);
+        StudyMember studyMember = studyMemberRepository.findByStudyAndUser(study, user);
+        if (!studyMember.isActive()) {
+            study.getMembers().remove(studyMember);
+            studyMemberRepository.delete(studyMember);
+        } else {
+            //TODO 적절한 예외 찾거나, 만들기
+            throw new IllegalStateException("잘못된 요청입니다.");
+        }
+    }
+
+    public String enrollmentAccept(Long studyId, Long studyMemberId) {
+        Study study = findStudyById(studyId);
+        StudyMember studyMember = studyMemberRepository.findById(studyMemberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디 멤버입니다: " + studyMemberId));
+
+        if (!studyMember.getStudy().getId().equals(studyId) ) {
+            throw new IllegalStateException("잘못된 요청입니다.");
+        }
+        if (countActiveMember(study) + 1 >= study.getLimitOfEnrollment()) {
+            return "모집할 수 있는 회원수를 초과했습니다. 모집 가능 회원수: " + study.getLimitOfEnrollment() + "명";
+        }
+
+        studyMember.setActive(true);
+        studyMember.setActiveDate(LocalDateTime.now());
+        return "가입 요청을 수락했습니다.";
+    }
+
+    public void enrollmentReject(Long studyId, Long studyMemberId) {
+        StudyMember studyMember = studyMemberRepository.findById(studyMemberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디 멤버입니다: " + studyMemberId));
+        if (studyMember.getStudy().getId().equals(studyId)) {
+            studyMemberRepository.delete(studyMember);
+        } else {
+            //TODO 적절한 예외 찾거나, 만들기
+            throw new IllegalStateException("잘못된 요청입니다.");
+        }
+    }
+
+    public void withdrawal(Long studyId, User user) {
+        Study study = findStudyById(studyId);
+        StudyMember studyMember = studyMemberRepository.findByStudyAndUser(study, user);
+        studyMemberRepository.delete(studyMember);
+    }
+
+    public void forceWithdrawal(Long studyId, Long studyMemberId) {
+        StudyMember studyMember = studyMemberRepository.findById(studyMemberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디 멤버입니다: " + studyMemberId));
+        if (studyMember.getStudy().getId().equals(studyId)) {
+            studyMemberRepository.delete(studyMember);
+        } else {
+            //TODO 적절한 예외 찾거나, 만들기
+            throw new IllegalStateException("잘못된 요청입니다.");
+        }
+    }
+
+    public int countActiveMember(Study study) {
+        int count = 0;
+        for (StudyMember member : study.getMembers()) {
+            if (member.isActive()) {
+                count++;
+            }
+        }
+        return count;
     }
 }
