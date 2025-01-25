@@ -1,28 +1,158 @@
 <!DOCTYPE html>
 <html lang="en"
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
-<head th:replace="~{layout/fragments.html :: head}"></head>
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="~{layout/fragments.html :: head}">
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
 
 <body>
-    <div th:replace="~{layout/fragments.html :: main-nav}"></div>
+<div th:replace="~{layout/fragments.html :: main-nav}"></div>
 
-    <div class="container">
-        <div class="row justify-content-center my-5">
-            <div class="col-3 me-5">
-                <div th:replace="~{study/layout/study.html :: study}"></div>
+<div class="container">
+    <div class="row justify-content-center my-5">
+        <div class="col-3 me-5">
+            <div th:replace="~{study/layout/study.html :: study}"></div>
+        </div>
+
+        <div class="col-7">
+            <div class="row">
+                <div th:replace="~{study/layout/studyNav.html :: studyNav(currentMenu='info')}"></div>
             </div>
 
-            <div class="col-7">
-                <div class="row">
-                    <div th:replace="~{study/layout/studyNav.html :: studyNav(currentMenu='info')}"></div>
+            <div class="row justify-content-center">
+                <div class="px-4 my-4" th:utext="${study.fullDescription}"></div>
+            </div>
+
+            <div class="row justify-content-center bg-light-subtle px-4">
+                <div class="h5 my-4">
+                    댓글 <span class="text-primary" th:text="${studyComments.size()}"></span>
                 </div>
-                <div class="row  justify-content-center">
-                    <div class="col-10 my-4" th:utext="${study.fullDescription}"></div>
+
+                <!-- 댓글 작성 -->
+                <div class="commentForm mb-4">
+                    <form class="needs-validation" th:action="@{/study/{id}/comment(id=${study.id})}" th:object="${createStudyCommentForm}" method="post" novalidate>
+                        <textarea id="content" name="content" th:field="*{content}" class="form-control" aria-describedby="contentHelp" placeholder="250자 이내" required maxlength="250"></textarea>
+                        <button class="btn btn-primary btn-sm my-2" type="submit">댓글 작성</button>
+<!--                        <small class="invalid-feedback">댓글을 250자 이내로 입력하세요</small>-->
+                        <small th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="text-danger"></small>
+                    </form>
+                </div>
+
+                <!-- 댓글 목록 -->
+                <div class="comment d-flex align-items-start my-3" th:each="comment : ${studyComments}">
+                    <img th:src="${comment.user.profileImage}"
+                         width="45" height="45" class="rounded-circle border me-3"/>
+                    <div class="flex-grow-1">
+                        <div>
+                            <a th:href="@{/profile/{nickname}(nickname=${comment.user.nickname})}"
+                               class="h5 mb-0 me-2 text-decoration-none text-dark link-primary">
+                                <strong th:text="${comment.user.nickname}">작성자 이름</strong>
+                            </a>
+                            <small th:text="${#temporals.format(comment.lastModifiedDate, 'yyyy-MM-dd HH:mm')}" class="text-muted d-block"></small>
+                        </div>
+                        <div class="content mt-4 w-100 d-flex justify-content-between align-items-center" id="comment-container-[[${comment.id}]]">
+                            <!-- 댓글 내용 -->
+                            <span th:text="${comment.content}" id="comment-[[${comment.id}]]" class="text-body-secondary mb-0"></span>
+
+                            <!-- 댓글 수정 및 삭제 버튼 -->
+                            <div th:if="${comment.user.username == #authentication.principal.username}" class="button-group" id="button-group-[[${comment.id}]]">
+                                <button class="btn btn-sm btn-outline-primary"
+                                        type="button"
+                                        data-id="[[${comment.id}]]"
+                                        onclick="showEditInput(this)">
+                                    수정
+                                </button>
+
+                                <form th:action="@{/study/{studyId}/comment/{commentId}/delete(studyId=${study.id}, commentId=${comment.id})}"
+                                      method="post" class="d-inline-block">
+                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                                    <button class="btn btn-sm btn-primary" onclick="return confirm('이 댓글을 삭제하시겠습니까?')">삭제</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- 수정 입력 필드 -->
+                        <div id="edit-form-[[${comment.id}]]" style="display: none;">
+                            <form class="needs-validation mt-2" th:action="@{/study/{studyId}/comment/{commentId}/update(studyId=${study.id}, commentId=${comment.id})}"
+                                  method="post">
+                                <textarea name="content" class="form-control mb-2" th:text="${comment.content}" aria-describedby="contentHelp" placeholder="250자 이내" required maxlength="250"></textarea>
+                                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary btn-sm">저장</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="hideEditInput(this)">취소</button>
+                                </div>
+                            </form>
+                        </div>
+                            <hr class="w-100 my-2 border-top border-secondary"/>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
+</div>
+
+<script type="application/javascript">
+    (function () {
+        'use strict';
+
+        window.addEventListener('load', function () {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+
+            // Loop over them and prevent submission
+            Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        }, false)
+    }())
+</script>
+
+<script>
+    function showEditInput(button) {
+        const commentId = button.getAttribute('data-id'); // data-id 값을 가져오기
+        console.log("showEditInput called with commentId:", commentId);
+
+        const commentText = document.getElementById('comment-' + commentId);
+        const editForm = document.getElementById('edit-form-' + commentId);
+        const buttonGroup = document.getElementById('button-group-' + commentId); // 버튼 그룹
+
+        if (commentText && editForm && buttonGroup) {
+            console.log(`Showing edit form for comment ID: ${commentId}`);
+            commentText.style.display = 'none'; // 기존 댓글 숨기기
+            editForm.style.display = 'block';  // 수정 필드 보이기
+            buttonGroup.style.display = 'none'; // 버튼 숨기기
+        } else {
+            console.error(`Element not found for comment ID: ${commentId}`);
+        }
+    }
+
+    function hideEditInput(button) {
+        const editFormContainer = button.closest('div[id^="edit-form"]');
+        const commentId = editFormContainer.id.replace('edit-form-', '');
+        console.log("hideEditInput called with commentId:", commentId);
+
+        const commentText = document.getElementById('comment-' + commentId);
+        const editForm = document.getElementById('edit-form-' + commentId);
+        const buttonGroup = document.getElementById('button-group-' + commentId); // 버튼 그룹
+
+        if (commentText && editForm && buttonGroup) {
+            console.log(`Hiding edit form for comment ID: ${commentId}`);
+            commentText.style.display = 'block'; // 기존 댓글 보이기
+            editForm.style.display = 'none';     // 수정 필드 숨기기
+            buttonGroup.style.display = 'flex'; // 버튼 다시 보이기
+        } else {
+            console.error(`Element not found for comment ID: ${commentId}`);
+        }
+    }
+</script>
 </body>
 </html>

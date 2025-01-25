@@ -44,7 +44,8 @@ public class SecurityConfig {
                                 "/node_modules/**",
                                 "/signup", "/login", "/",
                                 "/checkemailtoken",
-                                "/emaillogin", "/checkemaillogin", "/loginlink", "/loginbyemail"
+                                "/emaillogin", "/checkemaillogin", "/loginlink", "/loginbyemail",
+                                "/study/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/profile/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()

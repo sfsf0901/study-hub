@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout/fragments.html :: head}"></head>
+<head th:replace="~{layout/fragments.html :: head}">
+</head>
 
 <body>
     <div th:replace="~{layout/fragments.html :: main-nav}"></div>
@@ -15,7 +16,7 @@
                 <div class="form-group mb-3">
                     <label for="title" class="mb-2">제목</label>
                     <input id="title" name="title" type="text" th:field="*{title}" class="form-control"
-                           aria-describedby="titleHelp" required max="50">
+                           aria-describedby="titleHelp" required max="50"  autofocus>
                     <small class="invalid-feedback">스터디 제목을 입력하세요</small>
                     <small class="form-text text-danger" th:errors="*{title}">Title Error</small>
                 </div>
@@ -167,5 +168,8 @@
             })
         });
     </script>
+
+    <link rel="stylesheet" href="/node_modules/summernote/dist/summernote-bs5.min.css">
+    <script src="/node_modules/summernote/dist/summernote-bs5.min.js"></script>
 </body>
 </html>

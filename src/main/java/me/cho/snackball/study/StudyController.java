@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import me.cho.snackball.global.security.CurrentUser;
 import me.cho.snackball.settings.location.LocationService;
 import me.cho.snackball.settings.studyTag.StudyTagService;
+import me.cho.snackball.study.comment.StudyCommentService;
+import me.cho.snackball.study.comment.domain.StudyComment;
+import me.cho.snackball.study.comment.dto.CreateStudyCommentForm;
 import me.cho.snackball.study.domain.*;
 import me.cho.snackball.study.dto.*;
 import me.cho.snackball.user.domain.User;
@@ -28,9 +31,11 @@ public class StudyController {
     private final StudyMemberRepository studyMemberRepository;
     private final StudyTagService studyTagService;
     private final LocationService locationService;
+    private final StudyCommentService studyCommentService;
 
     @GetMapping("/study/create")
     public String createStudyForm(@CurrentUser User user, Model model) {
+        model.addAttribute("profileImage", user.getProfileImage());
         model.addAttribute(new CreateStudyForm());
         model.addAttribute("studyTags", studyTagService.getStudyTagNames());
         model.addAttribute("locations", locationService.getLocationNames());
@@ -44,6 +49,7 @@ public class StudyController {
                               BindingResult bindingResult,
                               Model model) {
         if (bindingResult.hasErrors()) {
+//            model.addAttribute("profileImage", user.getProfileImage());
             model.addAttribute("studyTags", studyTagService.getStudyTagNames());
             model.addAttribute("locations", locationService.getLocationNames());
             return "study/createStudy";
@@ -56,6 +62,8 @@ public class StudyController {
     public String updateStudyForm(@PathVariable("studyId") Long studyId,
                                 @CurrentUser User user,
                                 Model model) {
+        model.addAttribute("profileImage", user.getProfileImage());
+
         Study study = studyService.getStudyToUpdate(user, studyId);
         //TODO 서비스에 메서드 만드는게 나을까?
         List<String> studyStudyTagNames = study.getStudyStudyTags().stream().map(StudyStudyTag::getName).toList();
@@ -77,6 +85,7 @@ public class StudyController {
                               BindingResult bindingResult,
                               Model model) {
         if (bindingResult.hasErrors()) {
+
             model.addAttribute("studyTags", studyTagService.getStudyTagNames());
             model.addAttribute("locations", locationService.getLocationNames());
             return "study/updateStudy";
@@ -97,7 +106,10 @@ public class StudyController {
             throw new IllegalStateException("해당 스터디에 접근 권한이 없습니다. studyId: " + studyId);
         }
 
-        model.addAttribute("profileImage", user.getProfileImage());
+        if (user != null) {
+            model.addAttribute("profileImage", user.getProfileImage());
+        }
+
         model.addAttribute("study", new ViewStudy(study));
 
         boolean isManager = studyService.isStudyManager(user, study);
@@ -111,6 +123,10 @@ public class StudyController {
 
         int activeMemberCount = studyService.countActiveMember(study);
         model.addAttribute("activeMemberCount", activeMemberCount);
+
+        List<StudyComment> studyComments = studyCommentService.findAll(studyId);
+        model.addAttribute("studyComments", studyComments);
+        model.addAttribute(new CreateStudyCommentForm());
 
         return "study/viewStudy";
     }

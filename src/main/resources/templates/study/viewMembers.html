@@ -21,7 +21,7 @@
                 <div class="font-weight-light mb-3" style="margin: 0; padding: 0;"><strong>*멤버 (<span th:text="${activeMemberCount + 1}"></span>)</strong></div>
                 <div th:each="manager : ${managersAndMembers.getManagers()}" class="d-flex align-items-center mb-3">
                     <img th:src="${manager.user.profileImage}"
-                         width="35" height="35" class="rounded-circle border me-3"/>
+                         width="50" height="50" class="rounded-circle border me-3"/>
                     <a th:href="@{/profile/{nickname}(nickname=${manager.user.nickname})}" class="h5 mb-0 me-2 text-decoration-none text-dark link-primary">
                         <strong th:text="${manager.user.nickname}">관리자 이름</strong>
                     </a>
