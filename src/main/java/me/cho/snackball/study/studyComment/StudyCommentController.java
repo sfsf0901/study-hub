@@ -1,9 +1,9 @@
-package me.cho.snackball.study.comment;
+package me.cho.snackball.study.studyComment;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.cho.snackball.global.security.CurrentUser;
-import me.cho.snackball.study.comment.dto.CreateStudyCommentForm;
+import me.cho.snackball.study.studyComment.dto.CreateStudyCommentForm;
 import me.cho.snackball.user.domain.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;

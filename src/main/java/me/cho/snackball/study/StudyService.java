@@ -30,7 +30,7 @@ public class StudyService {
     private final StudyMemberRepository studyMemberRepository;
 
 
-    public Study createStudy(User user, CreateStudyForm createStudyForm) {
+    public Long createStudy(User user, CreateStudyForm createStudyForm) {
         Study study = Study.createStudy(createStudyForm);
         studyRepository.save(study);
 
@@ -39,7 +39,7 @@ public class StudyService {
         createStudyTagsAndStudyStudyTags(createStudyForm.getStudyTags(), study);
         createStudyLocations(createStudyForm.getLocations(), study);
 
-        return study;
+        return study.getId();
     }
 
     private void createStudyTagsAndStudyStudyTags(List<String> studyTagNames, Study study) {
@@ -149,7 +149,16 @@ public class StudyService {
         return study.getMembers().contains(studyMember);
     }
 
-    public void enrollmentRequest(Long studyId, User user) {
+    public boolean isStudyManagerOrStudyMember(User user, Study study) {
+        if (isStudyManager(user, study) || isStudyMember(user, study)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+        public void enrollmentRequest(Long studyId, User user) {
         Study study = findStudyById(studyId);
         StudyMember studyMember = StudyMember.create(user, study); //TODO 저장되나?
     }

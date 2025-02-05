@@ -42,8 +42,7 @@
 
                 <!-- 댓글 목록 -->
                 <div class="comment d-flex align-items-start my-3" th:each="comment : ${studyComments}">
-                    <img th:src="${comment.user.profileImage}"
-                         width="45" height="45" class="rounded-circle border me-3"/>
+                    <img th:src="${comment.user.profileImage}" width="45" height="45" class="rounded-circle border me-3" />
                     <div class="flex-grow-1">
                         <div>
                             <a th:href="@{/profile/{nickname}(nickname=${comment.user.nickname})}"
@@ -52,47 +51,46 @@
                             </a>
                             <small th:text="${#temporals.format(comment.lastModifiedDate, 'yyyy-MM-dd HH:mm')}" class="text-muted d-block"></small>
                         </div>
-                        <div class="content mt-4 w-100 d-flex justify-content-between align-items-center" id="comment-container-[[${comment.id}]]">
+                        <div class="content mt-3 w-100">
                             <!-- 댓글 내용 -->
-                            <span th:text="${comment.content}" id="comment-[[${comment.id}]]" class="text-body-secondary mb-0"></span>
+                            <span th:id="'comment-' + ${comment.id}" th:text="${comment.content}" class="text-body-secondary"></span>
 
-                            <!-- 댓글 수정 및 삭제 버튼 -->
-                            <div th:if="${comment.user.username == #authentication.principal.username}" class="button-group" id="button-group-[[${comment.id}]]">
-                                <button class="btn btn-sm btn-outline-primary"
+                            <!-- 수정/삭제 버튼 -->
+                            <div th:if="${comment.user.username == #authentication.principal.username}" class="mt-2">
+                                <button class="btn btn-sm btn-outline-primary edit-button"
                                         type="button"
-                                        data-id="[[${comment.id}]]"
+                                        th:attr="data-id=${comment.id}"
                                         onclick="showEditInput(this)">
                                     수정
                                 </button>
-
                                 <form th:action="@{/study/{studyId}/comment/{commentId}/delete(studyId=${study.id}, commentId=${comment.id})}"
                                       method="post" class="d-inline-block">
-                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
                                     <button class="btn btn-sm btn-primary" onclick="return confirm('이 댓글을 삭제하시겠습니까?')">삭제</button>
                                 </form>
                             </div>
-                        </div>
 
-                        <!-- 수정 입력 필드 -->
-                        <div id="edit-form-[[${comment.id}]]" style="display: none;">
-                            <form class="needs-validation mt-2" th:action="@{/study/{studyId}/comment/{commentId}/update(studyId=${study.id}, commentId=${comment.id})}"
-                                  method="post">
-                                <textarea name="content" class="form-control mb-2" th:text="${comment.content}" aria-describedby="contentHelp" placeholder="250자 이내" required maxlength="250"></textarea>
-                                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                                <div class="d-flex gap-2">
-                                    <button type="submit" class="btn btn-primary btn-sm">저장</button>
-                                    <button type="button" class="btn btn-secondary btn-sm" onclick="hideEditInput(this)">취소</button>
-                                </div>
-                            </form>
+                            <!-- 수정 입력 폼 -->
+                            <div th:id="'edit-form-' + ${comment.id}" style="display: none;">
+                                <form th:action="@{/study/{studyId}/comment/{commentId}/update(studyId=${study.id}, commentId=${comment.id})}"
+                                      method="post" class="mt-2">
+                                    <textarea name="content" class="form-control mb-2" th:text="${comment.content}" required maxlength="250"></textarea>
+                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary btn-sm">저장</button>
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="hideEditInput(this)">취소</button>
+                                    </div>
+                                </form>
+                            </div>
+
                         </div>
-                            <hr class="w-100 my-2 border-top border-secondary"/>
-                        </div>
+                        <hr class="w-100 my-2 border-top border-secondary" />
                     </div>
+                </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 <script type="application/javascript">
     (function () {
@@ -118,41 +116,41 @@
 
 <script>
     function showEditInput(button) {
-        const commentId = button.getAttribute('data-id'); // data-id 값을 가져오기
-        console.log("showEditInput called with commentId:", commentId);
+        const commentId = button.getAttribute('data-id'); // data-id에서 댓글 ID 가져오기
+        console.log(`showEditInput called with commentId: ${commentId}`);
 
-        const commentText = document.getElementById('comment-' + commentId);
-        const editForm = document.getElementById('edit-form-' + commentId);
-        const buttonGroup = document.getElementById('button-group-' + commentId); // 버튼 그룹
+        const commentText = document.getElementById(`comment-${commentId}`); // 댓글 내용
+        const editForm = document.getElementById(`edit-form-${commentId}`); // 수정 폼
+        const buttonGroup = button.parentNode; // 버튼 그룹
 
         if (commentText && editForm && buttonGroup) {
-            console.log(`Showing edit form for comment ID: ${commentId}`);
-            commentText.style.display = 'none'; // 기존 댓글 숨기기
-            editForm.style.display = 'block';  // 수정 필드 보이기
-            buttonGroup.style.display = 'none'; // 버튼 숨기기
+            commentText.style.display = 'none'; // 댓글 텍스트 숨기기
+            editForm.style.display = 'block';  // 수정 폼 보이기
+            buttonGroup.style.display = 'none'; // 수정/삭제 버튼 숨기기
         } else {
-            console.error(`Element not found for comment ID: ${commentId}`);
+            console.error(`Elements not found for commentId: ${commentId}`);
         }
     }
 
     function hideEditInput(button) {
-        const editFormContainer = button.closest('div[id^="edit-form"]');
-        const commentId = editFormContainer.id.replace('edit-form-', '');
-        console.log("hideEditInput called with commentId:", commentId);
+        const editFormContainer = button.closest('div[id^="edit-form"]'); // 수정 폼 컨테이너
+        const commentId = editFormContainer.id.replace('edit-form-', ''); // 댓글 ID 추출
+        console.log(`hideEditInput called with commentId: ${commentId}`);
 
-        const commentText = document.getElementById('comment-' + commentId);
-        const editForm = document.getElementById('edit-form-' + commentId);
-        const buttonGroup = document.getElementById('button-group-' + commentId); // 버튼 그룹
+        const commentText = document.getElementById(`comment-${commentId}`); // 댓글 텍스트
+        const editForm = document.getElementById(`edit-form-${commentId}`); // 수정 폼
+        const buttonGroup = editForm.previousElementSibling; // 수정/삭제 버튼 그룹
 
         if (commentText && editForm && buttonGroup) {
-            console.log(`Hiding edit form for comment ID: ${commentId}`);
-            commentText.style.display = 'block'; // 기존 댓글 보이기
-            editForm.style.display = 'none';     // 수정 필드 숨기기
-            buttonGroup.style.display = 'flex'; // 버튼 다시 보이기
+            commentText.style.display = 'block'; // 댓글 텍스트 보이기
+            editForm.style.display = 'none';    // 수정 폼 숨기기
+            buttonGroup.style.display = 'flex'; // 수정/삭제 버튼 보이기
         } else {
-            console.error(`Element not found for comment ID: ${commentId}`);
+            console.error(`Elements not found for commentId: ${commentId}`);
         }
     }
+
 </script>
+
 </body>
 </html>

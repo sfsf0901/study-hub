@@ -30,7 +30,7 @@
 
                 <div th:each="member : ${managersAndMembers.getMembers()}" th:if="${member.active}" class="d-flex align-items-center mb-3">
                     <img th:src="${member.user.profileImage}"
-                         width="35" height="35" class="rounded-circle border me-3"/>
+                         width="50" height="50" class="rounded-circle border me-3"/>
                     <a th:href="@{/profile/{nickname}(nickname=${member.user.nickname})}" class="h5 mb-0 me-2 text-decoration-none text-dark link-primary">
                         <strong th:text="${member.user.nickname}">관리자 이름</strong>
                     </a>

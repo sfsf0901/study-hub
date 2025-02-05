@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragments.html :: head}">
+</head>
+
+<body>
+    <div th:replace="~{layout/fragments.html :: main-nav}"></div>
+
+    <div class="container py-5 ">
+        <div class="text-center mb-5">
+            <h2>글쓰기</h2>
+        </div>
+
+        <div class="row justify-content-center">
+            <form class="needs-validation col-sm-10" th:action="@{/study/{id}/board/createpost(id=${study.id})}" th:object="${createStudyPostForm}" method="post" novalidate>
+                <div class="form-group mb-3">
+                    <label for="title" class="mb-2">제목</label>
+                    <input id="title" name="title" type="text" th:field="*{title}" class="form-control"
+                           aria-describedby="titleHelp" required max="50" autofocus>
+                    <small class="invalid-feedback">제목을 입력하세요</small>
+                    <small class="form-text text-danger" th:errors="*{title}">Title Error</small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="summernote" class="mb-2">내용</label>
+                    <textarea id="summernote" name="content" th:field="*{content}" class="form-control"
+                              aria-describedby="content" required></textarea>
+                    <small class="invalid-feedback">내용을 입력하세요</small>
+                    <small class="form-text text-danger" th:errors="*{content}">Content Error</small>
+                </div>
+
+                <div class="form-group">
+<!--                    <button class="btn btn-primary btn-block mt-2" type="submit">취소</button>-->
+                    <button class="btn btn-primary btn-block mt-2" type="submit">저장</button>
+                    <a th:href="@{/study/{studyId}/board(studyId=${study.id})}" class="btn btn-outline-primary mt-2">취소</a>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+
+    <script type="application/javascript">
+        (function () {
+            'use strict';
+
+            window.addEventListener('load', function () {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+
+                // Loop over them and prevent submission
+                Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+            }, false)
+        }())
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Tooltip을 수동으로 활성화
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+
+    <script type="application/javascript">
+        $(document).ready(function() {
+            $('#summernote').summernote({
+                // tooltip: false,
+                fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Noto Sans KR', 'Merriweather'],
+                placeholder: '스터디의 목표, 일정, 진행 방식, 사용할 교재 또는 인터넷 강좌 그리고 모집중인 스터디원 등 스터디에 대해 자세히 적어 주세요.',
+                tabsize: 2,
+                height: 300
+            })
+        });
+    </script>
+
+    <link rel="stylesheet" href="/node_modules/summernote/dist/summernote-bs5.min.css">
+    <script src="/node_modules/summernote/dist/summernote-bs5.min.js"></script>
+</body>
+</html>

@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import me.cho.snackball.global.security.CurrentUser;
 import me.cho.snackball.settings.location.LocationService;
 import me.cho.snackball.settings.studyTag.StudyTagService;
-import me.cho.snackball.study.comment.StudyCommentService;
-import me.cho.snackball.study.comment.domain.StudyComment;
-import me.cho.snackball.study.comment.dto.CreateStudyCommentForm;
+import me.cho.snackball.study.studyComment.StudyCommentService;
+import me.cho.snackball.study.studyComment.domain.StudyComment;
+import me.cho.snackball.study.studyComment.dto.CreateStudyCommentForm;
 import me.cho.snackball.study.domain.*;
 import me.cho.snackball.study.dto.*;
 import me.cho.snackball.user.domain.User;
@@ -54,8 +54,8 @@ public class StudyController {
             model.addAttribute("locations", locationService.getLocationNames());
             return "study/createStudy";
         }
-        Study study = studyService.createStudy(user, createStudyForm);
-        return "redirect:/study/" + study.getId();
+        Long studyId = studyService.createStudy(user, createStudyForm);
+        return "redirect:/study/" + studyId;
     }
 
     @GetMapping("/study/{studyId}/update")

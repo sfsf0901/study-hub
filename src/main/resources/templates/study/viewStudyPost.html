@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6" xmlns="http://www.w3.org/1999/html">
+<head th:replace="~{layout/fragments.html :: head}">
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+
+<body>
+<div th:replace="~{layout/fragments.html :: main-nav}"></div>
+
+<div class="container">
+    <div class="row justify-content-center my-5">
+        <div class="col-3 me-5">
+            <div th:replace="~{study/layout/study.html :: study}"></div>
+        </div>
+
+        <div class="col-7">
+            <div class="row">
+                <div th:replace="~{study/layout/studyNav.html :: studyNav(currentMenu='board')}"></div>
+            </div>
+
+            <div class="row px-4 my-5 justify-content-center">
+                <div class="mb-3 h3" th:text="${studyPost.title}"></div>
+                <div>
+                    <a th:href="@{/profile/{nickname}(nickname=${studyPost.user.nickname})}" class="text-decoration-none text-dark link-primary">
+                        <Strong th:text="${studyPost.user.nickname}"></Strong>
+                    </a>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted" th:text="${#temporals.format(studyPost.lastModifiedDate, 'yyyy-MM-dd HH:mm')}"></small>
+                </div>
+                <hr class="text-muted">
+                <div th:utext="${studyPost.content}"></div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center px-4 mt-2">
+                <div>
+                    <a th:href="@{/study/{studyId}/board(studyId=${study.id})}" class="btn btn-outline-primary">목록으로</a>
+                </div>
+                <div th:if="${studyPost.user.username == #authentication.principal.username}">
+                    <a th:href="@{/study/{studyId}/board/{studyPostId}/update(studyId=${study.id}, studyPostId=${studyPost.id})}" class="btn btn-outline-primary">수정</a>
+                    <form th:action="@{/study/{studyId}/board/{studyPostId}/delete(studyId=${study.id}, studyPostId=${studyPost.id})}"
+                          method="post"
+                          class="d-inline">
+                        <button type="submit" class="btn btn-primary" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+                    </form>
+                </div>
+            </div>
+
+
+            <div class="row justify-content-center bg-light-subtle px-4">
+<!--                <div class="h5 my-4">-->
+<!--                    댓글 <span class="text-primary" th:text="${studyComments.size()}"></span>-->
+<!--                </div>-->
+
+                <!-- 댓글 작성 -->
+<!--                <div class="commentForm mb-4">-->
+<!--                    <form class="needs-validation" th:action="@{/study/{id}/comment(id=${study.id})}" th:object="${createStudyCommentForm}" method="post" novalidate>-->
+<!--                        <textarea id="content" name="content" th:field="*{content}" class="form-control" aria-describedby="contentHelp" placeholder="250자 이내" required maxlength="250"></textarea>-->
+<!--                        <button class="btn btn-primary btn-sm my-2" type="submit">댓글 작성</button>-->
+<!--&lt;!&ndash;                        <small class="invalid-feedback">댓글을 250자 이내로 입력하세요</small>&ndash;&gt;-->
+<!--                        <small th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="text-danger"></small>-->
+<!--                    </form>-->
+<!--                </div>-->
+
+                <!-- 댓글 목록 -->
+<!--                <div class="comment d-flex align-items-start my-3" th:each="comment : ${studyComments}">-->
+<!--                    <img th:src="${comment.user.profileImage}" width="45" height="45" class="rounded-circle border me-3" />-->
+<!--                    <div class="flex-grow-1">-->
+<!--                        <div>-->
+<!--                            <a th:href="@{/profile/{nickname}(nickname=${comment.user.nickname})}"-->
+<!--                               class="h5 mb-0 me-2 text-decoration-none text-dark link-primary">-->
+<!--                                <strong th:text="${comment.user.nickname}">작성자 이름</strong>-->
+<!--                            </a>-->
+<!--                            <small th:text="${#temporals.format(comment.lastModifiedDate, 'yyyy-MM-dd HH:mm')}" class="text-muted d-block"></small>-->
+<!--                        </div>-->
+<!--                        <div class="content mt-3 w-100">-->
+<!--                            &lt;!&ndash; 댓글 내용 &ndash;&gt;-->
+<!--                            <span th:id="'comment-' + ${comment.id}" th:text="${comment.content}" class="text-body-secondary"></span>-->
+
+<!--                            &lt;!&ndash; 수정/삭제 버튼 &ndash;&gt;-->
+<!--                            <div th:if="${comment.user.username == #authentication.principal.username}" class="mt-2">-->
+<!--                                <button class="btn btn-sm btn-outline-primary edit-button"-->
+<!--                                        type="button"-->
+<!--                                        th:attr="data-id=${comment.id}"-->
+<!--                                        onclick="showEditInput(this)">-->
+<!--                                    수정-->
+<!--                                </button>-->
+<!--                                <form th:action="@{/study/{studyId}/comment/{commentId}/delete(studyId=${study.id}, commentId=${comment.id})}"-->
+<!--                                      method="post" class="d-inline-block">-->
+<!--                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />-->
+<!--                                    <button class="btn btn-sm btn-primary" onclick="return confirm('이 댓글을 삭제하시겠습니까?')">삭제</button>-->
+<!--                                </form>-->
+<!--                            </div>-->
+
+<!--                            &lt;!&ndash; 수정 입력 폼 &ndash;&gt;-->
+<!--                            <div th:id="'edit-form-' + ${comment.id}" style="display: none;">-->
+<!--                                <form th:action="@{/study/{studyId}/comment/{commentId}/update(studyId=${study.id}, commentId=${comment.id})}"-->
+<!--                                      method="post" class="mt-2">-->
+<!--                                    <textarea name="content" class="form-control mb-2" th:text="${comment.content}" required maxlength="250"></textarea>-->
+<!--                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />-->
+<!--                                    <div class="d-flex gap-2">-->
+<!--                                        <button type="submit" class="btn btn-primary btn-sm">저장</button>-->
+<!--                                        <button type="button" class="btn btn-secondary btn-sm" onclick="hideEditInput(this)">취소</button>-->
+<!--                                    </div>-->
+<!--                                </form>-->
+<!--                            </div>-->
+
+<!--                        </div>-->
+<!--                        <hr class="w-100 my-2 border-top border-secondary" />-->
+<!--                    </div>-->
+<!--                </div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="application/javascript">
+    (function () {
+        'use strict';
+
+        window.addEventListener('load', function () {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+
+            // Loop over them and prevent submission
+            Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        }, false)
+    }())
+</script>
+
+<script>
+    function showEditInput(button) {
+        const commentId = button.getAttribute('data-id'); // data-id에서 댓글 ID 가져오기
+        console.log(`showEditInput called with commentId: ${commentId}`);
+
+        const commentText = document.getElementById(`comment-${commentId}`); // 댓글 내용
+        const editForm = document.getElementById(`edit-form-${commentId}`); // 수정 폼
+        const buttonGroup = button.parentNode; // 버튼 그룹
+
+        if (commentText && editForm && buttonGroup) {
+            commentText.style.display = 'none'; // 댓글 텍스트 숨기기
+            editForm.style.display = 'block';  // 수정 폼 보이기
+            buttonGroup.style.display = 'none'; // 수정/삭제 버튼 숨기기
+        } else {
+            console.error(`Elements not found for commentId: ${commentId}`);
+        }
+    }
+
+    function hideEditInput(button) {
+        const editFormContainer = button.closest('div[id^="edit-form"]'); // 수정 폼 컨테이너
+        const commentId = editFormContainer.id.replace('edit-form-', ''); // 댓글 ID 추출
+        console.log(`hideEditInput called with commentId: ${commentId}`);
+
+        const commentText = document.getElementById(`comment-${commentId}`); // 댓글 텍스트
+        const editForm = document.getElementById(`edit-form-${commentId}`); // 수정 폼
+        const buttonGroup = editForm.previousElementSibling; // 수정/삭제 버튼 그룹
+
+        if (commentText && editForm && buttonGroup) {
+            commentText.style.display = 'block'; // 댓글 텍스트 보이기
+            editForm.style.display = 'none';    // 수정 폼 숨기기
+            buttonGroup.style.display = 'flex'; // 수정/삭제 버튼 보이기
+        } else {
+            console.error(`Elements not found for commentId: ${commentId}`);
+        }
+    }
+
+</script>
+
+</body>
+</html>
