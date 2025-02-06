@@ -105,7 +105,7 @@
                     <div class="col-1"></div>
                     <div class="col-11">
     <!--                댓글 작성-->
-                        <div class="commentForm my-4">
+                        <div class="commentForm my-3">
                             <form class="needs-validation" th:action="@{/study/{studyId}/board/{studyPostId}/comment(studyId=${study.id}, studyPostId=${studyPost.id})}" th:object="${createStudyPostCommentForm}" method="post" novalidate>
                                 <textarea id="content" name="content" th:field="*{content}" class="form-control" aria-describedby="contentHelp" placeholder="250자 이내" required maxlength="250"></textarea>
                                 <button class="btn btn-primary btn-sm my-2" type="submit">댓글 작성</button>
