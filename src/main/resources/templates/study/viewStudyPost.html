@@ -49,69 +49,72 @@
                 </div>
             </div>
 
+            <div class="row justify-content-center bg-light-subtle px-4 my-4">
+                <div class="h5 my-4">
+                    댓글 <span class="text-primary" th:text="${studyPostComments.size()}"></span>
+                </div>
 
-            <div class="row justify-content-center bg-light-subtle px-4">
-<!--                <div class="h5 my-4">-->
-<!--                    댓글 <span class="text-primary" th:text="${studyComments.size()}"></span>-->
-<!--                </div>-->
+<!--                 댓글 목록-->
+                <div class="comment d-flex align-items-start my-3" th:each="comment : ${studyPostComments}">
+                    <img th:src="${comment.user.profileImage}" width="45" height="45" class="rounded-circle border me-3" />
+                    <div class="flex-grow-1">
+                        <div>
+                            <a th:href="@{/profile/{nickname}(nickname=${comment.user.nickname})}"
+                               class="h5 mb-0 me-2 text-decoration-none text-dark link-primary">
+                                <strong th:text="${comment.user.nickname}">작성자 이름</strong>
+                            </a>
+                            <small th:text="${#temporals.format(comment.lastModifiedDate, 'yyyy-MM-dd HH:mm')}" class="text-muted d-block"></small>
+                        </div>
+                        <div class="content mt-3 w-100">
+                            <!-- 댓글 내용 -->
+                            <span th:id="'comment-' + ${comment.id}" th:text="${comment.content}" class="text-body-secondary"></span>
 
-                <!-- 댓글 작성 -->
-<!--                <div class="commentForm mb-4">-->
-<!--                    <form class="needs-validation" th:action="@{/study/{id}/comment(id=${study.id})}" th:object="${createStudyCommentForm}" method="post" novalidate>-->
-<!--                        <textarea id="content" name="content" th:field="*{content}" class="form-control" aria-describedby="contentHelp" placeholder="250자 이내" required maxlength="250"></textarea>-->
-<!--                        <button class="btn btn-primary btn-sm my-2" type="submit">댓글 작성</button>-->
-<!--&lt;!&ndash;                        <small class="invalid-feedback">댓글을 250자 이내로 입력하세요</small>&ndash;&gt;-->
-<!--                        <small th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="text-danger"></small>-->
-<!--                    </form>-->
-<!--                </div>-->
+                            <!-- 수정/삭제 버튼 -->
+                            <div th:if="${comment.user.username == #authentication.principal.username}" class="mt-2">
+                                <button class="btn btn-sm btn-outline-primary edit-button"
+                                        type="button"
+                                        th:attr="data-id=${comment.id}"
+                                        onclick="showEditInput(this)">
+                                    수정
+                                </button>
+                                <form th:action="@{/study/{studyId}/board/{studyPostId}/comment/{commentId}/delete(studyId=${study.id}, studyPostId=${studyPost.id}, commentId=${comment.id})}"
+                                      method="post" class="d-inline-block">
+                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                    <button class="btn btn-sm btn-primary" onclick="return confirm('이 댓글을 삭제하시겠습니까?')">삭제</button>
+                                </form>
+                            </div>
 
-                <!-- 댓글 목록 -->
-<!--                <div class="comment d-flex align-items-start my-3" th:each="comment : ${studyComments}">-->
-<!--                    <img th:src="${comment.user.profileImage}" width="45" height="45" class="rounded-circle border me-3" />-->
-<!--                    <div class="flex-grow-1">-->
-<!--                        <div>-->
-<!--                            <a th:href="@{/profile/{nickname}(nickname=${comment.user.nickname})}"-->
-<!--                               class="h5 mb-0 me-2 text-decoration-none text-dark link-primary">-->
-<!--                                <strong th:text="${comment.user.nickname}">작성자 이름</strong>-->
-<!--                            </a>-->
-<!--                            <small th:text="${#temporals.format(comment.lastModifiedDate, 'yyyy-MM-dd HH:mm')}" class="text-muted d-block"></small>-->
-<!--                        </div>-->
-<!--                        <div class="content mt-3 w-100">-->
-<!--                            &lt;!&ndash; 댓글 내용 &ndash;&gt;-->
-<!--                            <span th:id="'comment-' + ${comment.id}" th:text="${comment.content}" class="text-body-secondary"></span>-->
+                            <!-- 수정 입력 폼 -->
+                            <div th:id="'edit-form-' + ${comment.id}" style="display: none;">
+                                <form th:action="@{/study/{studyId}/board/{studyPostId}/comment/{commentId}/update(studyId=${study.id}, studyPostId=${studyPost.id}, commentId=${comment.id})}"
+                                      method="post" class="mt-2">
+                                    <textarea name="content" class="form-control mb-2" th:text="${comment.content}" required maxlength="250"></textarea>
+                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary btn-sm">저장</button>
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="hideEditInput(this)">취소</button>
+                                    </div>
+                                </form>
+                            </div>
 
-<!--                            &lt;!&ndash; 수정/삭제 버튼 &ndash;&gt;-->
-<!--                            <div th:if="${comment.user.username == #authentication.principal.username}" class="mt-2">-->
-<!--                                <button class="btn btn-sm btn-outline-primary edit-button"-->
-<!--                                        type="button"-->
-<!--                                        th:attr="data-id=${comment.id}"-->
-<!--                                        onclick="showEditInput(this)">-->
-<!--                                    수정-->
-<!--                                </button>-->
-<!--                                <form th:action="@{/study/{studyId}/comment/{commentId}/delete(studyId=${study.id}, commentId=${comment.id})}"-->
-<!--                                      method="post" class="d-inline-block">-->
-<!--                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />-->
-<!--                                    <button class="btn btn-sm btn-primary" onclick="return confirm('이 댓글을 삭제하시겠습니까?')">삭제</button>-->
-<!--                                </form>-->
-<!--                            </div>-->
-
-<!--                            &lt;!&ndash; 수정 입력 폼 &ndash;&gt;-->
-<!--                            <div th:id="'edit-form-' + ${comment.id}" style="display: none;">-->
-<!--                                <form th:action="@{/study/{studyId}/comment/{commentId}/update(studyId=${study.id}, commentId=${comment.id})}"-->
-<!--                                      method="post" class="mt-2">-->
-<!--                                    <textarea name="content" class="form-control mb-2" th:text="${comment.content}" required maxlength="250"></textarea>-->
-<!--                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />-->
-<!--                                    <div class="d-flex gap-2">-->
-<!--                                        <button type="submit" class="btn btn-primary btn-sm">저장</button>-->
-<!--                                        <button type="button" class="btn btn-secondary btn-sm" onclick="hideEditInput(this)">취소</button>-->
-<!--                                    </div>-->
-<!--                                </form>-->
-<!--                            </div>-->
-
-<!--                        </div>-->
-<!--                        <hr class="w-100 my-2 border-top border-secondary" />-->
-<!--                    </div>-->
-<!--                </div>-->
+                        </div>
+                        <hr class="w-100 my-2 border-top border-secondary" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-1"></div>
+                    <div class="col-11">
+    <!--                댓글 작성-->
+                        <div class="commentForm my-4">
+                            <form class="needs-validation" th:action="@{/study/{studyId}/board/{studyPostId}/comment(studyId=${study.id}, studyPostId=${studyPost.id})}" th:object="${createStudyPostCommentForm}" method="post" novalidate>
+                                <textarea id="content" name="content" th:field="*{content}" class="form-control" aria-describedby="contentHelp" placeholder="250자 이내" required maxlength="250"></textarea>
+                                <button class="btn btn-primary btn-sm my-2" type="submit">댓글 작성</button>
+                                <!--                        <small class="invalid-feedback">댓글을 250자 이내로 입력하세요</small>-->
+                                <small th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="text-danger"></small>
+                            </form>
+                        </div>
+                    </div>
+                </div>
                 </div>
             </div>
         </div>

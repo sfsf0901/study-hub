@@ -1,13 +1,10 @@
 package me.cho.snackball.study.board;
 
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import me.cho.snackball.study.board.domain.QStudyPost;
 import me.cho.snackball.study.board.domain.StudyPost;
-import me.cho.snackball.user.domain.QUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;

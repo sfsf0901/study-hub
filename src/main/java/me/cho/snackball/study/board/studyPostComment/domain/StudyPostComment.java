@@ -1,18 +1,17 @@
-package me.cho.snackball.study.board.postComment.domain;
+package me.cho.snackball.study.board.studyPostComment.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import me.cho.snackball.global.BaseUserEntity;
 import me.cho.snackball.study.board.domain.StudyPost;
-import me.cho.snackball.study.domain.Study;
-import me.cho.snackball.study.studyComment.dto.CreateStudyCommentForm;
+import me.cho.snackball.study.board.studyPostComment.dto.CreateStudyPostCommentForm;
 import me.cho.snackball.user.domain.User;
 
 @Entity
 @Getter @Setter @EqualsAndHashCode (of = "id")
 @AllArgsConstructor @NoArgsConstructor
-public class PostComment extends BaseUserEntity {
+public class StudyPostComment extends BaseUserEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,8 +29,8 @@ public class PostComment extends BaseUserEntity {
     private StudyPost studyPost;
 
 
-    public static PostComment create(StudyPost studyPost, User user, CreateStudyCommentForm form) {
-        PostComment studyComment = new PostComment();
+    public static StudyPostComment create(StudyPost studyPost, User user, CreateStudyPostCommentForm form) {
+        StudyPostComment studyComment = new StudyPostComment();
         studyComment.setContent(form.getContent());
         studyComment.setUser(user);
         studyComment.setStudyPost(studyPost);

@@ -26,13 +26,14 @@ public class StudyCommentService {
         return studyCommentRepository.findByStudyId(studyId);
     }
 
-    public void createComment(Long studyId, User user, CreateStudyCommentForm form) {
+    public Long createComment(Long studyId, User user, CreateStudyCommentForm form) {
         Study study = studyService.findStudyById(studyId);
-        studyCommentRepository.save(StudyComment.create(study, user, form));
+        StudyComment studyComment = studyCommentRepository.save(StudyComment.create(study, user, form));
+        return studyComment.getId();
     }
 
     public void updateComment(Long studyId, Long commentId, User user, CreateStudyCommentForm form) {
-        StudyComment comment = studyCommentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+        StudyComment comment = findStudyComment(commentId);
 
         // 권한 확인: 댓글 작성자인지 확인
         if (!comment.getUser().getId().equals(user.getId())) {
@@ -45,7 +46,7 @@ public class StudyCommentService {
     }
 
     public void deleteStudyComment(Long commentId, User user) {
-        StudyComment comment = studyCommentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+        StudyComment comment = findStudyComment(commentId);
 
         if (!comment.getUser().getId().equals(user.getId())) {
             log.warn("User ID {} does not have permission to edit comment ID {}", user.getId(), commentId);
@@ -53,5 +54,9 @@ public class StudyCommentService {
         }
 
         studyCommentRepository.delete(comment);
+    }
+
+    private StudyComment findStudyComment(Long commentId) {
+        return studyCommentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
     }
 }

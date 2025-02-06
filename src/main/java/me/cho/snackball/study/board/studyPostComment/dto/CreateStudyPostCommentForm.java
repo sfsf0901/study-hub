@@ -1,4 +1,4 @@
-package me.cho.snackball.study.board.postComment.dto;
+package me.cho.snackball.study.board.studyPostComment.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -9,7 +9,7 @@ import org.hibernate.validator.constraints.Length;
 
 @Data
 @AllArgsConstructor @NoArgsConstructor
-public class CreatePostCommentForm extends BaseUserEntity {
+public class CreateStudyPostCommentForm extends BaseUserEntity {
 
     @NotBlank
     @Length(max = 250)

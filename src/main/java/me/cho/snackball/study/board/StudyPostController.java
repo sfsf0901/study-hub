@@ -9,14 +9,15 @@ import me.cho.snackball.study.board.domain.StudyPost;
 import me.cho.snackball.study.board.dto.CreateStudyPostForm;
 import me.cho.snackball.study.board.dto.StudyPostDto;
 import me.cho.snackball.study.board.dto.UpdateStudyPostForm;
-import me.cho.snackball.study.board.postComment.dto.CreatePostCommentForm;
+import me.cho.snackball.study.board.studyPostComment.StudyPostCommentQueryRepository;
+import me.cho.snackball.study.board.studyPostComment.domain.StudyPostComment;
+import me.cho.snackball.study.board.studyPostComment.dto.CreateStudyPostCommentForm;
 import me.cho.snackball.study.domain.Study;
 import me.cho.snackball.study.domain.StudyMember;
 import me.cho.snackball.study.dto.ViewStudy;
 import me.cho.snackball.user.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,6 +37,7 @@ public class StudyPostController {
     private final StudyMemberRepository studyMemberRepository;
     private final StudyPostService studyPostService;
     private final StudyPostQueryRepository studyPostQueryRepository;
+    private final StudyPostCommentQueryRepository studyPostCommentQueryRepository;
 
     @GetMapping("/study/{studyId}/board")
     public String viewStudyBoard(@PathVariable("studyId") Long studyId,
@@ -76,7 +78,7 @@ public class StudyPostController {
 
     @GetMapping("/study/{studyId}/board/{studyPostId}")
     public String viewStudyPost(@PathVariable("studyId") Long studyId,
-                                @PathVariable Long studyPostId,
+                                @PathVariable("studyPostId") Long studyPostId,
                                 @CurrentUser User user,
                                 Model model) {
         Study study = studyService.findStudyById(studyId);
@@ -102,7 +104,10 @@ public class StudyPostController {
         StudyPost studyPost = studyPostService.findStudyPost(studyPostId);
         model.addAttribute("studyPost", studyPost);
 
-        model.addAttribute(new CreatePostCommentForm());
+        List<StudyPostComment> studyPostComments = studyPostCommentQueryRepository.findAllWithUser(studyPostId);
+        model.addAttribute("studyPostComments", studyPostComments);
+        model.addAttribute(new CreateStudyPostCommentForm());
+
 
         return "study/viewStudyPost";
     }

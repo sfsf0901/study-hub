@@ -19,7 +19,7 @@ public class StudyCommentController {
 
     @PostMapping("/study/{studyId}/comment")
     public String createStudyComment(@PathVariable("studyId") Long studyId,
-                                     @Valid CreateStudyCommentForm createStudyCommentForm,
+                                     @Valid CreateStudyCommentForm form,
                                      BindingResult bindingResult,
                                      @CurrentUser User user,
                                      RedirectAttributes redirectAttributes) {
@@ -29,17 +29,17 @@ public class StudyCommentController {
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors());
-            return "redirect:/study/" + studyId;
+            return "redirect:/study/{studyId}";
         }
 
-        studyCommentService.createComment(studyId, user, createStudyCommentForm);
+        studyCommentService.createComment(studyId, user, form);
         return "redirect:/study/" + studyId;
     }
 
     @PostMapping("/study/{studyId}/comment/{commentId}/update")
     public String updateStudyComment(@PathVariable("studyId") Long studyId,
                                      @PathVariable("commentId") Long commentId,
-                                     @Valid CreateStudyCommentForm createStudyCommentForm,
+                                     @Valid CreateStudyCommentForm form,
                                      BindingResult bindingResult,
                                      @CurrentUser User user) {
         if (user == null) {
@@ -50,7 +50,7 @@ public class StudyCommentController {
             return "redirect:/study/" + studyId;
         }
 
-        studyCommentService.updateComment(studyId, commentId, user, createStudyCommentForm);
+        studyCommentService.updateComment(studyId, commentId, user, form);
         return "redirect:/study/" + studyId;
     }
 

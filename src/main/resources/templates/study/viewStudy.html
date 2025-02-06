@@ -57,7 +57,7 @@
 
                             <!-- 수정/삭제 버튼 -->
                             <div th:if="${comment.user.username == #authentication.principal.username}" class="mt-2">
-                                <button class="btn btn-sm btn-outline-primary edit-button"
+                                <button class="btn btn-sm btn-outline-primary edit-button me-1"
                                         type="button"
                                         th:attr="data-id=${comment.id}"
                                         onclick="showEditInput(this)">
