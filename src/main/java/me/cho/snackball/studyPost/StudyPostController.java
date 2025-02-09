@@ -1,17 +1,17 @@
-package me.cho.snackball.study.board;
+package me.cho.snackball.studyPost;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.cho.snackball.global.security.CurrentUser;
 import me.cho.snackball.study.StudyMemberRepository;
 import me.cho.snackball.study.StudyService;
-import me.cho.snackball.study.board.domain.StudyPost;
-import me.cho.snackball.study.board.dto.CreateStudyPostForm;
-import me.cho.snackball.study.board.dto.StudyPostDto;
-import me.cho.snackball.study.board.dto.UpdateStudyPostForm;
-import me.cho.snackball.study.board.studyPostComment.StudyPostCommentQueryRepository;
-import me.cho.snackball.study.board.studyPostComment.domain.StudyPostComment;
-import me.cho.snackball.study.board.studyPostComment.dto.CreateStudyPostCommentForm;
+import me.cho.snackball.studyPost.domain.StudyPost;
+import me.cho.snackball.studyPost.dto.CreateStudyPostForm;
+import me.cho.snackball.studyPost.dto.StudyPostDto;
+import me.cho.snackball.studyPost.dto.UpdateStudyPostForm;
+import me.cho.snackball.studyPostComment.StudyPostCommentQueryRepository;
+import me.cho.snackball.studyPostComment.domain.StudyPostComment;
+import me.cho.snackball.studyPostComment.dto.CreateStudyPostCommentForm;
 import me.cho.snackball.study.domain.Study;
 import me.cho.snackball.study.domain.StudyMember;
 import me.cho.snackball.study.dto.ViewStudy;

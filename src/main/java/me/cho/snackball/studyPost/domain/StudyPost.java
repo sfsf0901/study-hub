@@ -1,13 +1,11 @@
-package me.cho.snackball.study.board.domain;
+package me.cho.snackball.studyPost.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import me.cho.snackball.global.BaseUserEntity;
-import me.cho.snackball.study.board.dto.CreateStudyPostForm;
-import me.cho.snackball.study.board.dto.UpdateStudyPostForm;
+import me.cho.snackball.studyPost.dto.CreateStudyPostForm;
+import me.cho.snackball.studyPost.dto.UpdateStudyPostForm;
 import me.cho.snackball.study.domain.Study;
-import me.cho.snackball.study.dto.CreateStudyForm;
 import me.cho.snackball.user.domain.User;
 
 @Entity

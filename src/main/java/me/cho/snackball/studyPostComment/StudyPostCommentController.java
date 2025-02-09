@@ -1,11 +1,9 @@
-package me.cho.snackball.study.board.studyPostComment;
+package me.cho.snackball.studyPostComment;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.cho.snackball.global.security.CurrentUser;
-import me.cho.snackball.study.board.studyPostComment.dto.CreateStudyPostCommentForm;
-import me.cho.snackball.study.studyComment.StudyCommentService;
-import me.cho.snackball.study.studyComment.dto.CreateStudyCommentForm;
+import me.cho.snackball.studyPostComment.dto.CreateStudyPostCommentForm;
 import me.cho.snackball.user.domain.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;

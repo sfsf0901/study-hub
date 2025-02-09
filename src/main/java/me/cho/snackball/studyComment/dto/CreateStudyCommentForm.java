@@ -1,4 +1,4 @@
-package me.cho.snackball.study.studyComment.dto;
+package me.cho.snackball.studyComment.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import me.cho.snackball.global.security.CurrentUser;
 import me.cho.snackball.settings.location.LocationService;
 import me.cho.snackball.settings.studyTag.StudyTagService;
-import me.cho.snackball.study.studyComment.StudyCommentService;
-import me.cho.snackball.study.studyComment.domain.StudyComment;
-import me.cho.snackball.study.studyComment.dto.CreateStudyCommentForm;
+import me.cho.snackball.studyComment.StudyCommentService;
+import me.cho.snackball.studyComment.domain.StudyComment;
+import me.cho.snackball.studyComment.dto.CreateStudyCommentForm;
 import me.cho.snackball.study.domain.*;
 import me.cho.snackball.study.dto.*;
 import me.cho.snackball.user.domain.User;
@@ -70,7 +70,7 @@ public class StudyController {
         List<String> studyLocationNames = study.getStudyLocations().stream()
                 .sorted(Comparator.comparing(StudyLocation::getProvince).thenComparing(StudyLocation::getCity))
                 .map(StudyLocation::toString).toList();
-        model.addAttribute(new UpdateStudyForm(study, studyStudyTagNames, studyLocationNames));
+        model.addAttribute("updateStudyForm", new UpdateStudyForm(study, studyStudyTagNames, studyLocationNames));
 
         model.addAttribute("studyTags", studyTagService.getStudyTagNames());
         model.addAttribute("locations", locationService.getLocationNames());
@@ -85,7 +85,6 @@ public class StudyController {
                               BindingResult bindingResult,
                               Model model) {
         if (bindingResult.hasErrors()) {
-
             model.addAttribute("studyTags", studyTagService.getStudyTagNames());
             model.addAttribute("locations", locationService.getLocationNames());
             return "study/updateStudy";

@@ -1,4 +1,4 @@
-package me.cho.snackball.study.board.studyPostComment.dto;
+package me.cho.snackball.studyPostComment.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

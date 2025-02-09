@@ -1,6 +1,6 @@
-package me.cho.snackball.study.studyComment;
+package me.cho.snackball.studyComment;
 
-import me.cho.snackball.study.studyComment.domain.StudyComment;
+import me.cho.snackball.studyComment.domain.StudyComment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 

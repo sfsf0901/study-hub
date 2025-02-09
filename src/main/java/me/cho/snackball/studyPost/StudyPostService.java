@@ -1,10 +1,9 @@
-package me.cho.snackball.study.board;
+package me.cho.snackball.studyPost;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import me.cho.snackball.study.board.domain.StudyPost;
-import me.cho.snackball.study.board.dto.CreateStudyPostForm;
-import me.cho.snackball.study.board.dto.UpdateStudyPostForm;
+import me.cho.snackball.studyPost.domain.StudyPost;
+import me.cho.snackball.studyPost.dto.CreateStudyPostForm;
+import me.cho.snackball.studyPost.dto.UpdateStudyPostForm;
 import me.cho.snackball.study.domain.Study;
 import me.cho.snackball.user.domain.User;
 import org.springframework.stereotype.Service;

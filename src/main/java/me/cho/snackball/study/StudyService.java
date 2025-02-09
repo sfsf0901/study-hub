@@ -61,6 +61,8 @@ public class StudyService {
     public void updateStudy(User user, UpdateStudyForm updateStudyForm) {
         Study study = getStudyToUpdate(user, updateStudyForm.getStudyId());
         study.setTitle(updateStudyForm.getTitle());
+        //TODO 모집된 회원수보다 이하로 수정 못하게 하는 로직 추가하기
+        study.setLimitOfEnrollment(updateStudyForm.getLimitOfEnrollment());
         updateStudyTagsAndStudyStudyTags(updateStudyForm.getStudyTags(), study);
         updateStudyLocations(updateStudyForm.getLocations(), study);
         study.setFullDescription(updateStudyForm.getFullDescription());

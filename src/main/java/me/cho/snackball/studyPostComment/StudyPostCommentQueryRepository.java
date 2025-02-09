@@ -1,13 +1,11 @@
-package me.cho.snackball.study.board.studyPostComment;
+package me.cho.snackball.studyPostComment;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import me.cho.snackball.study.board.StudyPostSearchCondition;
-import me.cho.snackball.study.board.domain.StudyPost;
-import me.cho.snackball.study.board.studyPostComment.domain.QStudyPostComment;
-import me.cho.snackball.study.board.studyPostComment.domain.StudyPostComment;
-import me.cho.snackball.user.domain.QUser;
+import me.cho.snackball.studyPost.domain.QStudyPost;
+import me.cho.snackball.studyPostComment.domain.QStudyPostComment;
+import me.cho.snackball.studyPostComment.domain.StudyPostComment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -16,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static me.cho.snackball.study.board.studyPostComment.domain.QStudyPostComment.*;
+import static me.cho.snackball.studyPostComment.domain.QStudyPostComment.*;
 import static me.cho.snackball.user.domain.QUser.*;
 
 @Repository

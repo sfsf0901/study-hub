@@ -1,4 +1,4 @@
-package me.cho.snackball.study.board;
+package me.cho.snackball.studyPost;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

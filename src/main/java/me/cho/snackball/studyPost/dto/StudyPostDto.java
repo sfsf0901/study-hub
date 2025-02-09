@@ -1,13 +1,10 @@
-package me.cho.snackball.study.board.dto;
+package me.cho.snackball.studyPost.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.cho.snackball.global.BaseUserEntity;
-import me.cho.snackball.study.board.domain.StudyPost;
-import me.cho.snackball.user.domain.User;
-import org.hibernate.validator.constraints.Length;
+import me.cho.snackball.studyPost.domain.StudyPost;
 
 import java.time.LocalDateTime;
 

@@ -1,10 +1,10 @@
-package me.cho.snackball.study.studyComment;
+package me.cho.snackball.studyComment;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.cho.snackball.study.StudyService;
-import me.cho.snackball.study.studyComment.domain.StudyComment;
-import me.cho.snackball.study.studyComment.dto.CreateStudyCommentForm;
+import me.cho.snackball.studyComment.domain.StudyComment;
+import me.cho.snackball.studyComment.dto.CreateStudyCommentForm;
 import me.cho.snackball.study.domain.Study;
 import me.cho.snackball.user.domain.User;
 import org.springframework.stereotype.Service;
