@@ -107,5 +107,37 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 수락 버튼 확인창
+            document.querySelectorAll("form[action*='/enroll/accept']").forEach(form => {
+                form.addEventListener("submit", function (event) {
+                    if (!confirm("가입 요청을 수락하시겠습니까?")) {
+                        event.preventDefault();
+                    }
+                });
+            });
+
+            // 반려 버튼 확인창
+            document.querySelectorAll("form[action*='/enroll/reject']").forEach(form => {
+                form.addEventListener("submit", function (event) {
+                    if (!confirm("가입 요청을 반려하시겠습니까?")) {
+                        event.preventDefault();
+                    }
+                });
+            });
+
+            // 탈퇴 버튼 확인창
+            document.querySelectorAll("form[action*='/forcewithdrawal']").forEach(form => {
+                form.addEventListener("submit", function (event) {
+                    if (!confirm("정말 이 회원을 탈퇴시키겠습니까?")) {
+                        event.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
+
 </body>
 </html>

@@ -3,8 +3,6 @@ package me.cho.snackball.study.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import me.cho.snackball.settings.studyTag.domain.StudyTag;
-import me.cho.snackball.settings.studyTag.domain.UserStudyTag;
 import me.cho.snackball.user.domain.User;
 
 @Entity

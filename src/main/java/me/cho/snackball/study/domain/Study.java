@@ -3,13 +3,13 @@ package me.cho.snackball.study.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import me.cho.snackball.global.BaseUserEntity;
+import me.cho.snackball.location.domain.StudyLocation;
 import me.cho.snackball.study.dto.CreateStudyForm;
+import me.cho.snackball.studyTag.domain.StudyStudyTag;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter @Setter @EqualsAndHashCode (of = "id")
@@ -29,8 +29,6 @@ public class Study extends BaseUserEntity {
     private String path;
 
     private String title;
-
-//    private String shortDescription;
 
     @Lob @Basic(fetch = FetchType.EAGER)
     private String fullDescription;

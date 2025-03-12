@@ -1,4 +1,4 @@
-package me.cho.snackball.settings.location.domain;
+package me.cho.snackball.location.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

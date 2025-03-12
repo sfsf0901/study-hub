@@ -1,11 +1,12 @@
 package me.cho.snackball.study.dto;
 
 import lombok.Data;
+import me.cho.snackball.location.domain.StudyLocation;
 import me.cho.snackball.study.domain.*;
+import me.cho.snackball.studyTag.domain.StudyStudyTag;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Data
 public class ViewStudy {

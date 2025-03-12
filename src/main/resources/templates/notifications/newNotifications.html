@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="~{layout/fragments.html :: head}">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+
+<body>
+<div th:replace="~{layout/fragments.html :: main-nav}"></div>
+
+<div class="container">
+  <div class="row justify-content-center my-5">
+    <div class="col-3">
+      <!-- 사이드 네비게이션 -->
+      <div th:replace="~{notifications/layout/notificationSideNav.html :: notificationSideNav(currentMenu='new')}"></div>
+    </div>
+
+    <div class="col-7">
+      <form id="deleteForm" th:action="@{/notifications/new/delete}" method="post">
+        <div class="card">
+          <div class="card-header">
+            <small>새로운 알림을 확인하세요.</small>
+          </div>
+
+          <ul class="list-group list-group-flush">
+            <li th:if="${notifications.size() == 0}" class="list-group-item">
+              <div class="my-3 text-muted d-flex w-100 justify-content-center">
+                <span>알림 메시지가 없습니다.</span>
+              </div>
+            </li>
+
+            <li th:each="notification : ${notifications}" class="list-group-item">
+              <div class="d-flex w-100 justify-content-between">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" th:id="'checkbox-' + ${notification.id}" th:value="${notification.id}" name="notificationIds" style="cursor: pointer;">
+                  <div class="notification-title"
+                       th:data-id="${notification.id}"
+                       th:data-title="${notification.title}"
+                       th:data-message="${notification.message}"
+                       th:data-studyTitle="${notification.studyTitle}"
+                       th:data-link="${notification.link}"
+                       data-bs-toggle="modal"
+                       data-bs-target="#exampleModal"
+                       style="cursor: pointer;">
+                    <strong><span th:text="${notification.title}"></span></strong>
+                  </div>
+                </div>
+                <small class="fromNow text-muted" th:text="${#temporals.format(notification.createdDate, 'yyyy-MM-dd HH:mm')}">3 days ago</small>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalTitle">알림 제목</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" id="modalBody">
+                알림 내용이 여기에 표시됩니다.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary mt-3" id="deleteButton">삭제</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ 읽음 처리용 hidden form -->
+<form id="markAsReadForm" th:action="@{/notification/new/check}" method="post">
+  <input type="hidden" name="notificationId" id="notificationIdInput">
+  <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>  <!-- ✅ CSRF 토큰 추가 -->
+</form>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    let currentNotificationId = null; // 현재 클릭된 알림 ID 저장
+
+    document.querySelectorAll(".notification-title").forEach(function(titleElement) {
+      titleElement.addEventListener("click", function(event) {
+        const clickedElement = event.currentTarget;
+        if (!clickedElement) {
+          console.error("🚨 notification-title을 찾을 수 없음.");
+          return;
+        }
+
+        // ✅ 클릭된 알림의 ID 가져오기
+        currentNotificationId = clickedElement.getAttribute("data-id");
+        console.log("📌 클릭한 알림 ID:", currentNotificationId);
+
+        if (!currentNotificationId) {
+          console.error("🚨 notification-title 요소에 data-id 속성이 없습니다.");
+          return;
+        }
+
+        // ✅ 모달에 데이터 업데이트
+        const notificationTitle = clickedElement.getAttribute("data-title") || "제목 없음";
+        const notificationMessage = clickedElement.getAttribute("data-message") || "내용 없음";
+        const studyTitle = clickedElement.getAttribute("data-studyTitle") || "스터디 정보 없음";
+        const link = clickedElement.getAttribute("data-link") || "#";
+
+        document.getElementById("modalTitle").textContent = notificationTitle;
+        document.getElementById("modalBody").innerHTML = `
+                <p>${notificationMessage}</p>
+                <br>
+                <p><strong>스터디 이름:</strong> ${studyTitle}</p>
+                <p><a href="${link}" target="_blank">스터디 페이지로 이동</a></p>
+            `;
+      });
+    });
+
+    // ✅ 모달이 닫힐 때 동기 방식으로 읽음 처리 요청 보내기
+    document.getElementById("exampleModal").addEventListener("hidden.bs.modal", function () {
+      if (!currentNotificationId) return; // 클릭된 알림이 없으면 무시
+
+      console.log("✅ 모달 닫힘! 읽음 처리 요청 보냄:", currentNotificationId);
+
+      // ✅ form 요소 가져오기
+      const form = document.getElementById("markAsReadForm");
+      const input = document.getElementById("notificationIdInput");
+
+      if (!form || !input) {
+        console.error("🚨 markAsReadForm 또는 notificationIdInput이 존재하지 않음!");
+        return;
+      }
+
+      input.value = currentNotificationId; // ✅ 알림 ID 설정
+
+      setTimeout(() => {
+        console.log("✅ form 제출 실행!");
+        form.submit(); // ✅ 동기 방식으로 form 제출
+      }, 300);
+    });
+
+    // ✅ 삭제 버튼 클릭 시 선택된 알림 삭제
+    document.getElementById("deleteButton").addEventListener("click", function() {
+      const checkboxes = document.querySelectorAll(".form-check-input:checked");
+      if (checkboxes.length === 0) {
+        alert("삭제할 알림을 선택하세요.");
+        return;
+      }
+
+      if (confirm("선택한 알림을 삭제하시겠습니까?")) {
+        document.getElementById("deleteForm").submit();
+      }
+    });
+  });
+
+</script>
+
+</body>
+</html>

@@ -2,8 +2,8 @@ package me.cho.snackball.user.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import me.cho.snackball.settings.location.domain.UserLocation;
-import me.cho.snackball.settings.studyTag.domain.UserStudyTag;
+import me.cho.snackball.location.domain.UserLocation;
+import me.cho.snackball.studyTag.domain.UserStudyTag;
 import me.cho.snackball.global.BaseEntity;
 import me.cho.snackball.user.dto.SignupForm;
 

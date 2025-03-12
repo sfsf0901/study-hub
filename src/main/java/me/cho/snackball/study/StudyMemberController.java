@@ -64,6 +64,8 @@ public class StudyMemberController {
                                    RedirectAttributes redirectAttributes) {
         String result = studyService.enrollmentAccept(studyId, studyMemberId);
         redirectAttributes.addFlashAttribute("result", result);
+
+
         return "redirect:/study/" + studyId + "/settings/member";
     }
 

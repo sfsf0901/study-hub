@@ -1,13 +1,9 @@
 package me.cho.snackball.study.dto;
 
 import lombok.Data;
-import me.cho.snackball.settings.studyTag.domain.StudyTag;
 import me.cho.snackball.study.domain.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Data
 public class ViewMembers {

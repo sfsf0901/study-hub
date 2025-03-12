@@ -1,4 +1,4 @@
-package me.cho.snackball.settings.studyTag;
+package me.cho.snackball.studyTag;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;

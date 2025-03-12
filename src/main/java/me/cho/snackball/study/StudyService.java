@@ -1,14 +1,19 @@
 package me.cho.snackball.study;
 
 import lombok.RequiredArgsConstructor;
-import me.cho.snackball.settings.location.LocationRepository;
-import me.cho.snackball.settings.location.domain.Location;
-import me.cho.snackball.settings.studyTag.StudyTagService;
-import me.cho.snackball.settings.studyTag.domain.StudyTag;
+import me.cho.snackball.location.LocationRepository;
+import me.cho.snackball.location.domain.Location;
+import me.cho.snackball.location.domain.StudyLocation;
+import me.cho.snackball.study.event.EnrollmentAcceptEvent;
+import me.cho.snackball.studyTag.StudyTagService;
+import me.cho.snackball.studyTag.domain.StudyStudyTag;
+import me.cho.snackball.studyTag.domain.StudyTag;
 import me.cho.snackball.study.domain.*;
 import me.cho.snackball.study.dto.CreateStudyForm;
 import me.cho.snackball.study.dto.UpdateStudyForm;
+import me.cho.snackball.study.event.StudyCreateEvent;
 import me.cho.snackball.user.domain.User;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +32,8 @@ public class StudyService {
     private final LocationRepository locationRepository;
     private final StudyManagerRepository studyManagerRepository;
     private final StudyMemberRepository studyMemberRepository;
+    private final StudyMemberQueryRepository studyMemberQueryRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     public Long createStudy(User user, CreateStudyForm createStudyForm) {
@@ -112,6 +118,8 @@ public class StudyService {
         Study study = getStudyToUpdate(user, studyId);
         study.setPublished(isPublished);
         study.setPublishedDate(LocalDateTime.now());
+
+        eventPublisher.publishEvent(new StudyCreateEvent(study));
     }
 
     public void updateRecruitingStatus(User user, Long studyId, Boolean isRecruiting) {
@@ -179,7 +187,10 @@ public class StudyService {
 
     public String enrollmentAccept(Long studyId, Long studyMemberId) {
         Study study = findStudyById(studyId);
-        StudyMember studyMember = studyMemberRepository.findById(studyMemberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디 멤버입니다: " + studyMemberId));
+        StudyMember studyMember = studyMemberQueryRepository.findByIdWithUser(studyMemberId);
+        if (studyMember == null) {
+            throw  new IllegalArgumentException("존재하지 않는 스터디 멤버입니다: " + studyMemberId);
+        }
 
         if (!studyMember.getStudy().getId().equals(studyId) ) {
             throw new IllegalStateException("잘못된 요청입니다.");
@@ -190,6 +201,9 @@ public class StudyService {
 
         studyMember.setActive(true);
         studyMember.setActiveDate(LocalDateTime.now());
+
+        eventPublisher.publishEvent(new EnrollmentAcceptEvent(study, studyMember.getUser()));
+
         return "가입 요청을 수락했습니다.";
     }
 

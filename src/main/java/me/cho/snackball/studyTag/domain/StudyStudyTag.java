@@ -1,9 +1,9 @@
-package me.cho.snackball.study.domain;
+package me.cho.snackball.studyTag.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import me.cho.snackball.settings.studyTag.domain.StudyTag;
+import me.cho.snackball.study.domain.Study;
 
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id")

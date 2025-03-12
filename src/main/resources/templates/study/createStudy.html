@@ -160,6 +160,21 @@
             })
         });
     </script>
+    <script type="application/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector(".needs-validation"); // 폼 선택
+            const submitButton = form.querySelector("button[type='submit']"); // 저장 버튼 선택
+
+            submitButton.addEventListener("click", function (event) {
+                event.preventDefault(); // 기본 제출 방지
+
+                if (confirm("정말로 스터디를 만드시겠어요?")) {
+                    form.submit(); // 확인 누르면 폼 제출
+                }
+            });
+        });
+    </script>
+
 
     <link rel="stylesheet" href="/node_modules/summernote/dist/summernote-bs5.min.css">
     <script src="/node_modules/summernote/dist/summernote-bs5.min.js"></script>

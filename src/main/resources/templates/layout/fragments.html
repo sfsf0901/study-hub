@@ -23,6 +23,16 @@
             min-height: 100vh;
             overflow: auto;
         }
+        .notification-badge {
+            font-size: 10px;  /* 배지 크기 조절 */
+            width: 16px;
+            height: 16px;
+            line-height: 16px;
+            padding: 0;
+            text-align: center;
+            top: -5px;
+            right: -5px;
+        }
     </style>
 </head>
 
@@ -87,9 +97,10 @@
                     </a>
                 </li>
                 <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link" th:href="@{/notifications}">
-                        <i class="fa-solid fa-bell"></i>
-<!--                        <i class="fa fa-bell-o" aria-hidden="true"></i>-->
+                    <a class="nav-link" th:href="@{/notifications/new}">
+                        <i class="fa-solid fa-bell position-relative">
+                            <span th:if="${count > 0}" th:text="${count}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">1</span>
+                        </i>
                     </a>
                 </li>
                 <li class="nav-item dropdown" sec:authorize="isAuthenticated()">

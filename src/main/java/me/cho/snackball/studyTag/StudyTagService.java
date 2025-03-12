@@ -1,7 +1,7 @@
-package me.cho.snackball.settings.studyTag;
+package me.cho.snackball.studyTag;
 
 import lombok.RequiredArgsConstructor;
-import me.cho.snackball.settings.studyTag.domain.StudyTag;
+import me.cho.snackball.studyTag.domain.StudyTag;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

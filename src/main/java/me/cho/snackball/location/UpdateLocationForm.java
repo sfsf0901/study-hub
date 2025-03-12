@@ -1,4 +1,4 @@
-package me.cho.snackball.settings.location;
+package me.cho.snackball.location;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

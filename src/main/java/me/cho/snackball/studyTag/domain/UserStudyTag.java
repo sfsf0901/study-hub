@@ -1,4 +1,4 @@
-package me.cho.snackball.settings.studyTag.domain;
+package me.cho.snackball.studyTag.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
