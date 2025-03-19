@@ -113,11 +113,14 @@ public class UserController {
 
     @GetMapping("/profile/{nickname}")
     public String viewProfile(@PathVariable String nickname, Model model, @CurrentUser User user) {
+
         User findUser = userRepository.findByNickname(nickname).orElseThrow(() -> new IllegalArgumentException(nickname + "에 해당하는 사용자가 없습니다."));
 
-        model.addAttribute("profileImg", findUser.getProfileImage());
+        model.addAttribute("profileImage", findUser.getProfileImage());
         model.addAttribute("profile", new Profile(findUser));
         model.addAttribute("isOwner", findUser.equals(user));
+
+        
         return "user/profileView";
     }
 

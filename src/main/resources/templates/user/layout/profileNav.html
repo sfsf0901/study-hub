@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:fragment="studyNav">
+    <title>Study Navigation</title>
+    <style>
+        .nav-link.active {
+            color: black !important; /* 활성화된 메뉴는 파란색 */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <ul th:fragment="profileNav(currentMenu)" class="nav nav-underline">
+        <li class="nav-item">
+            <a th:classappend="${currentMenu == 'study'} ? 'active'" th:href="@{'/profile/' + ${#authentication.principal.nickname}}" class="nav-link fs-5 text-dark" aria-current="true">통계</a>
+        </li>
+        <li class="nav-item">
+            <a th:classappend="${currentMenu == 'created'} ? 'active'" th:href="@{'/profile/' + ${#authentication.principal.nickname} + '/created'}" class="nav-link fs-5 text-dark" aria-current="true">만든 스터디</a>
+        </li>
+        <li class="nav-item">
+            <a th:classappend="${currentMenu == 'participating'} ? 'active'" th:href="@{'/profile/' + ${#authentication.principal.nickname} + '/participating'}" class="nav-link fs-5 text-dark" aria-current="true">가입한 스터디</a>
+        </li>
+    </ul>
+
+</body>
+</html>

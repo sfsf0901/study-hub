@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="~{layout/fragments.html :: head}"></head>
+<body>
+    <div th:replace="~{layout/fragments.html :: main-nav}"></div>
+
+    <div class="container mt-4">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 mt-3">
+            <div class="col d-flex" th:each="study : ${studies}">
+                <div class="card" style="width: 18rem;">
+                    <a th:href="@{/study/{id}(id=${study.id})}">
+                        <img th:src="${study.thumbnailUrl}" class="card-img-top" alt="..." style="height: 200px; object-fit: cover;">
+                    </a>
+                    <div class="card-body">
+                        <div class="title">
+                            <h5 th:text="*{study.title}"></h5>
+                        </div>
+                        <div class="tags">
+                            <span th:each="studyTag : *{study.studyStudyTags}" class="badge rounded-pill text-bg-info me-1">
+                                <a href="#" onclick="searchHandler(event, '', '${studyTag.name}')" style="text-decoration: none; color: inherit;">
+                                    # <span th:text="*{studyTag.name}">Tag Name</span>
+                                </a>
+                            </span>
+                        </div>
+                        <div class="locations">
+                            <span th:each="studyLocation : *{study.studyLocations}" class="badge rounded-pill text-bg-primary me-1">
+                                <a href="#" onclick="searchHandler(event, '', '', '${studyLocation.city}')" style="text-decoration: none; color: inherit;">
+                                    # <span th:text="*{studyLocation.city}">Tag Name</span>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <ul class="pagination">
+                <!-- 이전 페이지 버튼 -->
+                <li th:class="${currentPage == 0} ? 'disabled' : ''">
+                    <a th:href="@{/test/query(offset=${currentPage * limit}, limit=${limit})}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <!-- 페이지 번호들 -->
+                <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:class="${pageNum == currentPage} ? 'active' : ''">
+                    <a th:href="@{/test/query(offset=${pageNum * limit}, limit=${limit})}" th:text="${pageNum + 1}"></a>
+                </li>
+
+                <!-- 다음 페이지 버튼 -->
+                <li th:class="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                    <a th:href="@{/test/query(offset=${(currentPage + 1) * limit}, limit=${limit})}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

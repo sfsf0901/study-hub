@@ -12,11 +12,6 @@ import java.util.List;
 @AllArgsConstructor @NoArgsConstructor
 public class CreateStudyForm {
 
-/*    @NotBlank
-    @Length(min = 2, max = 20)
-    @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9]{2,20}$")
-    private String path;*/
-
     @NotBlank
     @Length(max = 30)
     private String title;

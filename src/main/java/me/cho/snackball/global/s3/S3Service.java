@@ -12,7 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.UUID;
 
 @Service
@@ -31,7 +34,7 @@ public class S3Service {
     /**
      * S3에 이미지 업로드 하기
      */
-    public String uploadImage(MultipartFile image, User user) {
+    public String uploadProfileImage(MultipartFile image, User user) {
 
         // 기존 이미지 삭제
         if (user.getProfileImage() != null && !user.getProfileImage().equals(IMAGE_URL)) {
@@ -61,6 +64,34 @@ public class S3Service {
         return getPublicUrl(fileName);
     }
 
+    // Summernote에서 업로드된 Base64 이미지 처리 후 S3에 저장
+    public String uploadBase64Image(String base64Image) {
+        try {
+            byte[] imageBytes = decodeBase64Image(base64Image);
+            String fileName = "study-images/" + UUID.randomUUID() + ".png";  // 파일명 랜덤 생성
+
+            InputStream inputStream = new ByteArrayInputStream(imageBytes);
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(imageBytes.length);
+            metadata.setContentType("image/png");
+
+            amazonS3.putObject(bucket, fileName, inputStream, metadata);
+            return getPublicUrl(fileName);  // S3 URL 반환
+
+        } catch (Exception e) {
+            log.error("Base64 이미지 업로드 실패: {}", e.getMessage(), e);
+            throw new RuntimeException("Base64 이미지 업로드 실패", e);
+        }
+    }
+
+    // 기존 로컬 파일 S3로 이동 후 URL 반환
+    public String uploadLocalFile(String localFilePath) {
+        String fileName = "study-images/" + UUID.randomUUID() + ".png";
+
+        amazonS3.putObject(bucket, fileName, new java.io.File(localFilePath));
+        return getPublicUrl(fileName);
+    }
+
     private String extractObjectKey(String imageUrl) {
         // URL 형식: https://{bucket-name}.s3.{region}.amazonaws.com/{object-key}
         return imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
@@ -68,5 +99,11 @@ public class S3Service {
 
     private String getPublicUrl(String fileName) {
         return String.format("https://%s.s3.%s.amazonaws.com/%s", bucket, amazonS3.getRegionName(), fileName);
+    }
+
+    // Base64 인코딩된 이미지 데이터를 디코딩
+    private byte[] decodeBase64Image(String base64Image) {
+        String base64Data = base64Image.split(",")[1];  // "data:image/png;base64,..." 형식에서 데이터만 추출
+        return Base64.getDecoder().decode(base64Data);
     }
 }

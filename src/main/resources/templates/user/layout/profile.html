@@ -9,44 +9,38 @@
 <body>
     <div th:fragment="profile" class="container">
         <div class="mb-3 text-center">
-            <img th:src="${profileImg}"
+            <img th:src="${profileImage}"
                  width="125" height="125" class="rounded-circle border"/>
         </div>
         <div class="text-center">
             <h2 th:text="${profile.nickname}"></h2>
         </div>
 
-        <div>
-            <p th:if="${!#strings.isEmpty(profile.username)}">
-                            <span style="font-size: 20px;">
-                                <i class="fa fa-link col-1"></i>
-                            </span>
+        <div class="mt-4">
+            <div th:if="${!#strings.isEmpty(profile.username)}" class="mt-2">
+                <small class="text-muted me-2"><i class="fa-regular fa-envelope"></i></small>
                 <span th:text="${profile.username}" class="col-11"></span>
-            </p>
-            <p th:if="${!#strings.isEmpty(profile.occupation)}">
-                            <span style="font-size: 20px;">
-                                <i class="fa fa-link col-1"></i>
-                            </span>
+            </div>
+            <div th:if="${!#strings.isEmpty(profile.occupation)}" class="mt-2">
+                <small class="text-muted me-2"><i class="fa-solid fa-briefcase"></i></small>
                 <span th:text="${profile.occupation}" class="col-11"></span>
-            </p>
-            <p th:if="${!#strings.isEmpty(profile.company)}">
-                            <span style="font-size: 20px;">
-                                <i class="fa fa-link col-1"></i>
-                            </span>
+            </div>
+            <div th:if="${!#strings.isEmpty(profile.company)}" class="mt-2">
+                <small class="text-muted me-2"><i class="fa-regular fa-building"></i></small>
                 <span th:text="${profile.company}" class="col-11"></span>
-            </p>
-            <p th:if="${!#strings.isEmpty(profile.url)}">
-                            <span style="font-size: 20px;">
-                                <i class="fa fa-link col-1"></i>
-                            </span>
+            </div>
+            <div th:if="${!#strings.isEmpty(profile.url)}" class="mt-2">
+                <small class="text-muted"><i class="fa fa-link col-1"></i></small>
                 <span th:text="${profile.url}" class="col-11"></span>
-            </p>
-            <p th:if="${!#strings.isEmpty(profile.description)}">
-                            <span style="font-size: 20px;">
-                                <i class="fa fa-link col-1"></i>
-                            </span>
+            </div>
+            <div th:if="${!#strings.isEmpty(profile.description)}" class="my-4">
                 <span th:text="${profile.description}" class="col-11"></span>
-            </p>
+            </div>
+            <div class="mt-5 mb-4">
+                <small>가입일: </small>
+                <small class="text-muted" th:text="${#temporals.format(profile.createdDate, 'yyyy-MM-dd')}"></small>
+            </div>
+
         </div>
 
         <div class="text-center">

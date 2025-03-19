@@ -171,7 +171,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         if (!updateProfileForm.getImageFile().isEmpty()) {
-            String imageUrl = s3Service.uploadImage(updateProfileForm.getImageFile(), savedUser);
+            String imageUrl = s3Service.uploadProfileImage(updateProfileForm.getImageFile(), savedUser);
             savedUser.setProfileImage(imageUrl);
             login(savedUser, request);
         }

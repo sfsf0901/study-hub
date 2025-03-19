@@ -2,12 +2,172 @@
 <html lang="en"
         xmlns:th="http://www.thymeleaf.org"
         xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
-<head th:replace="~{layout/fragments.html :: head}"></head>
+<head th:replace="~{layout/fragments.html :: head}">
+    <th:block th:replace="~{layout/fragments.html :: extraStyles}" />
+</head>
+
+<th:block th:fragment="extraStyles">
+    <style>
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+        .search-input {
+            width: 100%;
+            padding: 14px 20px;
+            padding-right: 50px;
+            border: 1px solid #cdcdcd;
+            border-radius: 400px;
+            background-color: #F6F6F6;
+            font-size: 16px;
+            color: #424242;
+            outline: none;
+        }
+        .search-input::placeholder {
+            color: #505050;
+        }
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .badge-info {
+            color: #ffffff; /* 원하는 글자색 */
+        }
+    </style>
+</th:block>
 
 <body>
     <div th:replace="~{layout/fragments.html :: main-nav}"></div>
 
+    <div class="banner">
+        <img th:src="${banner}" style="width: 100%; object-fit: cover;">
+    </div>
 
+    <div class="container mt-4">
+        <div class="search-container">
+            <div class="search-box">
+                <input type="search" id="searchInput" class="search-input"
+                       th:value="${searchConditions.keyword}"
+                       placeholder="스터디, 관심 태그, 지역 검색" required
+                       onkeyup="handleEnter(event)">
+                <i class="fa-solid fa-magnifying-glass search-icon" onclick="searchHandler(event, document.getElementById('searchInput').value)"></i>
+            </div>
+        </div>
 
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 mt-3">
+            <div class="col d-flex" th:each="study : ${studies}">
+                <div class="card" style="width: 18rem;">
+                    <a th:href="@{/study/{id}(id=${study.id})}">
+                        <img th:src="${study.thumbnailUrl}" class="card-img-top" alt="..." style="height: 150px; object-fit: cover;">
+                    </a>
+                    <div class="card-body">
+                        <div class="title">
+                            <a th:href="@{/study/{id}(id=${study.id})}" style="text-decoration: none; color: inherit;">
+                                <h5 th:text="*{study.title}"></h5>
+                            </a>
+                        </div>
+
+                        <div class="tags">
+                            <span th:each="studyTag : *{study.studyStudyTags}" class="badge rounded-pill text-bg-info me-1">
+                                <!-- 'data-tag' 속성에 studyTag.name을 저장하고 -->
+                                <a href="#" th:attr="data-tag=${studyTag.name}" onclick="searchHandler(event, '', this.dataset.tag, '')" style="text-decoration: none; color: inherit;">
+                                    # <span th:text="*{studyTag.name}">Tag Name</span>
+                                </a>
+                            </span>
+                        </div>
+
+                        <div class="locations">
+                            <span th:each="studyLocation : *{study.studyLocations}" class="badge rounded-pill text-bg-primary me-1">
+                                <!-- 'data-location' 속성에 studyLocation.city를 저장하고 -->
+                                <a href="#" th:attr="data-location=${studyLocation.city}" onclick="searchHandler(event, '', '', this.dataset.location)" style="text-decoration: none; color: inherit;">
+                                    # <span th:text="*{studyLocation.city}">Tag Name</span>
+                                </a>
+                            </span>
+                        </div>
+
+                        <div class="info d-flex justify-content-between mt-3">
+                            <div class="member-count">
+                                <small class="text-muted"><i class="fa-solid fa-user"></i></small>
+                                <small class="text-muted" th:text="*{study.members.size() + 1}"></small>
+                            </div>
+                            <div class="published-date">
+                                <small class="text-muted" th:text="${#temporals.format(study.publishedDate, 'yyyy-MM-dd')}"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${studies.size() > 0}" class="row justify-content-center my-5">
+            <div class="col-10">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination pagination-sm justify-content-center">
+                        <!-- 이전 페이지 -->
+                        <li class="page-item" th:classappend="${currentPage == 1}? 'disabled'">
+                            <a th:href="@{'/?offset=' + (${currentPage - 2} * ${limit}) + '&limit=' + ${limit}}"
+                               class="page-link">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <!-- 페이지 번호 -->
+                        <li class="page-item" th:classappend="${i == currentPage}? 'active'"
+                            th:each="i : ${#numbers.sequence(1, totalPages)}">
+                            <a th:href="@{'/?offset=' + ((${i} - 1) * ${limit}) + '&limit=' + ${limit}}"
+                               class="page-link" th:text="${i}"></a>
+                        </li>
+
+                        <!-- 다음 페이지 -->
+                        <li class="page-item" th:classappend="${currentPage >= totalPages}? 'disabled'">
+                            <a th:href="@{'/?offset=' + (${currentPage} * ${limit}) + '&limit=' + ${limit}}"
+                               class="page-link">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <br>
+        <br>
+        <div th:if="${totalElements == 0}" class="alert alert-light my-5" role="alert" style="width: 50%; margin: 0 auto;">
+            <div class="d-flex flex-column align-items-center justify-content-center text-center">
+                <i class="fa-solid fa-triangle-exclamation h2"></i>
+                <h5 class="mt-2">검색 결과가 없습니다.</h5>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 검색창 입력 시 처리
+        function handleEnter(event) {
+            if (event.key === "Enter") {
+                searchHandler(event, document.getElementById('searchInput').value);
+            }
+        }
+
+        // 검색어, 태그, 지역에 대한 검색 처리
+        function searchHandler(event, keyword, tag, location) {
+            let url = "/?keyword=" + encodeURIComponent(keyword)
+                + "&tag=" + encodeURIComponent(tag)
+                + "&location=" + encodeURIComponent(location)
+                + "&page=1&limit=20";  // 첫 페이지로 이동하도록 설정
+
+            window.location.href = url;  // 페이지 이동
+        }
+    </script>
 </body>
 </html>

@@ -1,6 +1,9 @@
 package me.cho.snackball.study.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import me.cho.snackball.global.BaseUserEntity;
 import me.cho.snackball.location.domain.StudyLocation;
@@ -19,22 +22,23 @@ public class Study extends BaseUserEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private String title;
+
+    @Lob @Basic(fetch = FetchType.EAGER)
+    @Column(nullable = false)
+    private String fullDescription;
+
+    private String thumbnailUrl;
+
+    @Column(nullable = false)
+    private int limitOfEnrollment;
+
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL)
     private List<StudyManager> managers = new ArrayList<>();
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL)
     private List<StudyMember> members = new ArrayList<>();
-
-    @Column(unique = true)
-    private String path;
-
-    private String title;
-
-    @Lob @Basic(fetch = FetchType.EAGER)
-    private String fullDescription;
-
-//    @Lob @Basic(fetch = FetchType.EAGER)
-//    private String image;
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL)
     private List<StudyStudyTag> studyStudyTags = new ArrayList<>();
@@ -43,8 +47,6 @@ public class Study extends BaseUserEntity {
     private List<StudyLocation> studyLocations = new ArrayList<>();
 
     //추가
-    private int limitOfEnrollment;
-
     private LocalDateTime publishedDate;
 
     private LocalDateTime closedDate;
@@ -57,19 +59,13 @@ public class Study extends BaseUserEntity {
 
     private boolean closed;
 
-    private boolean useBanner;
-
-    public static Study createStudy(CreateStudyForm createStudyForm) {
+    public static Study createStudy(CreateStudyForm createStudyForm, String updatedDescription, String thumbnailUrl) {
         Study study = new Study();
         study.setTitle(createStudyForm.getTitle());
-//        study.setShortDescription(createStudyForm.getShortDescription());
-        study.setFullDescription(createStudyForm.getFullDescription());
+        study.setFullDescription(updatedDescription);
+        study.setThumbnailUrl(thumbnailUrl);
         study.setLimitOfEnrollment(createStudyForm.getLimitOfEnrollment());
         return study;
     }
 
-//    public boolean isManager(CustomUserDetails customUserDetails) {
-//        User user = customUserDetails.getUser();
-//        return this.managers.contains()
-//    }
 }

@@ -74,7 +74,7 @@ public class SettingsController {
     @GetMapping(URL_PROFILE)
     public String updateProfileForm(@CurrentUser User user, Model model) {
 
-        model.addAttribute("profileImg", user.getProfileImage());
+        model.addAttribute("profileImage", user.getProfileImage());
         model.addAttribute("updateProfileForm", new UpdateProfileForm(user));
         return VIEW_PROFILE;
     }
@@ -90,7 +90,6 @@ public class SettingsController {
             return VIEW_PROFILE;
         }
 
-        System.out.println("updateProfileForm.getImageFile().isEmpty() = " + updateProfileForm.getImageFile().isEmpty());
         userService.updateProfile(user, updateProfileForm, request);
         redirectAttributes.addFlashAttribute("message", "프로필을 수정했습니다.");
         return "redirect:" + URL_PROFILE;
@@ -98,6 +97,7 @@ public class SettingsController {
 
     @GetMapping(URL_PASSWORD)
     public String updatePasswordForm(@CurrentUser User user, Model model) {
+        model.addAttribute("profileImage", user.getProfileImage());
         model.addAttribute(new UpdatePasswordForm());
         return VIEW_PASSWORD;
     }
@@ -119,6 +119,7 @@ public class SettingsController {
 
     @GetMapping(URL_NOTIFICATIONS)
     public String updateNotificationsForm(@CurrentUser User user, Model model) {
+        model.addAttribute("profileImage", user.getProfileImage());
         model.addAttribute(modelMapper.map(user, UpdateNotificationsForm.class));
         return VIEW_NOTIFICATIONS;
     }
@@ -140,6 +141,7 @@ public class SettingsController {
 
     @GetMapping(URL_STUDY_TAGS)
     public String updateStudyTagsForm(@CurrentUser User user, Model model) {
+        model.addAttribute("profileImage", user.getProfileImage());
         model.addAttribute("studyTags", studyTagService.getStudyTagNames());
 
         List<UserStudyTag> userStudyTags = userService.getUserStudyTags(user);
@@ -177,6 +179,7 @@ public class SettingsController {
 
     @GetMapping(URL_LOCATIONS)
     public String updateLocationsForm(@CurrentUser User user, Model model) {
+        model.addAttribute("profileImage", user.getProfileImage());
         model.addAttribute("locations", locationService.getLocationNames());
 
         List<UserLocation> userLocations = userService.getUserLocations(user);

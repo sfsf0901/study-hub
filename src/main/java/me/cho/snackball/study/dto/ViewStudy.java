@@ -41,7 +41,6 @@ public class ViewStudy {
 
     private boolean closed;
 
-    private boolean useBanner;
 
     public ViewStudy(Study study) {
         this.id = study.getId();
@@ -59,6 +58,5 @@ public class ViewStudy {
         this.recruiting = study.isRecruiting();
         this.published = study.isPublished();
         this.closed = study.isClosed();
-        this.useBanner = study.isUseBanner();
     }
 }

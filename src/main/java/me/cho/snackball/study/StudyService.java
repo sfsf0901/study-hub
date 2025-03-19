@@ -1,9 +1,12 @@
 package me.cho.snackball.study;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import me.cho.snackball.global.s3.S3Service;
 import me.cho.snackball.location.LocationRepository;
 import me.cho.snackball.location.domain.Location;
 import me.cho.snackball.location.domain.StudyLocation;
+import me.cho.snackball.study.dto.SearchConditions;
 import me.cho.snackball.study.event.EnrollmentAcceptEvent;
 import me.cho.snackball.studyTag.StudyTagService;
 import me.cho.snackball.studyTag.domain.StudyStudyTag;
@@ -14,6 +17,7 @@ import me.cho.snackball.study.dto.UpdateStudyForm;
 import me.cho.snackball.study.event.StudyCreateEvent;
 import me.cho.snackball.user.domain.User;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,23 +25,35 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class StudyService {
 
     private final StudyRepository studyRepository;
+    private final StudyQueryRepository studyQueryRepository;
     private final StudyTagService studyTagService;
     private final LocationRepository locationRepository;
     private final StudyManagerRepository studyManagerRepository;
     private final StudyMemberRepository studyMemberRepository;
     private final StudyMemberQueryRepository studyMemberQueryRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final S3Service s3Service;
+
+    private static final String DEFAULT_THUMBNAIL_URL = "https://snackball-static-files.s3.ap-northeast-2.amazonaws.com/default-thumbnail.png";
 
 
     public Long createStudy(User user, CreateStudyForm createStudyForm) {
-        Study study = Study.createStudy(createStudyForm);
+
+        String updatedDescription = processImagesAndUpload(createStudyForm.getFullDescription());
+        String firstImageUrl = extractFirstImageUrl(updatedDescription);
+        String thumbnailUrl = firstImageUrl != null ? firstImageUrl : DEFAULT_THUMBNAIL_URL;
+
+        Study study = Study.createStudy(createStudyForm, updatedDescription, thumbnailUrl);
         studyRepository.save(study);
 
         StudyManager.createStudyManager(user, study);
@@ -46,6 +62,56 @@ public class StudyService {
         createStudyLocations(createStudyForm.getLocations(), study);
 
         return study.getId();
+    }
+
+    // Summernote 에디터 내용에서 Base64 이미지를 추출하여 S3에 업로드 후 URL로 변경
+    private String processImagesAndUpload(String fullDescription) {
+        if (fullDescription == null || fullDescription.isEmpty()) {
+            return fullDescription;
+        }
+
+        Pattern pattern = Pattern.compile("<img[^>]+src=\"(data:image/[^\"]+)\"");
+        Matcher matcher = pattern.matcher(fullDescription);
+
+        StringBuffer updatedDescription = new StringBuffer();
+        String firstImageUrl = null; // 첫 번째 이미지 URL 저장
+
+        while (matcher.find()) {
+            String base64Image = matcher.group(1);
+            log.info("########Base64 이미지 발견: {}", base64Image.substring(0, 30) + "...");
+
+            try {
+                // S3에 업로드 후 새로운 URL 받기
+                String imageUrl = s3Service.uploadBase64Image(base64Image);
+                log.info("########S3에 저장 완료: {}", imageUrl);
+
+                // 첫 번째 이미지라면 썸네일로 저장
+                if (firstImageUrl == null) {
+                    firstImageUrl = imageUrl;
+                }
+
+                // 기존 Base64 이미지를 S3 URL로 변경
+                matcher.appendReplacement(updatedDescription, "<img src=\"" + imageUrl + "\"");
+
+            } catch (Exception e) {
+                log.error("######## Base64 이미지 업로드 실패: {}", e.getMessage());
+            }
+        }
+
+        matcher.appendTail(updatedDescription);
+
+        return updatedDescription.toString();
+    }
+
+    private String extractFirstImageUrl(String fullDescription) {
+        Pattern pattern = Pattern.compile("<img[^>]+src=\"(https://[^\"]+)\"");
+        Matcher matcher = pattern.matcher(fullDescription);
+
+        if (matcher.find()) {
+            return matcher.group(1); // 첫 번째 이미지 URL 반환
+        }
+
+        return null; // 이미지가 없으면 null 반환
     }
 
     private void createStudyTagsAndStudyStudyTags(List<String> studyTagNames, Study study) {
@@ -135,6 +201,7 @@ public class StudyService {
         study.setClosedDate(LocalDateTime.now());
     }
 
+    @Transactional(readOnly = true)
     public Study getStudyToUpdate(User user, Long studyId) {
         Study study = findStudyById(studyId);
         if (!isStudyManager(user, study)) {
@@ -143,22 +210,25 @@ public class StudyService {
         return study;
     }
 
+    @Transactional(readOnly = true)
     public Study findStudyById(Long studyId) {
         return studyRepository.findById(studyId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디입니다. 스터디 id: " + studyId));
 
     }
 
+    @Transactional(readOnly = true)
     public boolean isStudyManager(User user, Study study) {
         StudyManager studyManager = studyManagerRepository.findByStudyAndUser(study, user);
         return study.getManagers().contains(studyManager);
     }
 
-
+    @Transactional(readOnly = true)
     public boolean isStudyMember(User user, Study study) {
         StudyMember studyMember = studyMemberRepository.findByStudyAndUser(study, user);
         return study.getMembers().contains(studyMember);
     }
 
+    @Transactional(readOnly = true)
     public boolean isStudyManagerOrStudyMember(User user, Study study) {
         if (isStudyManager(user, study) || isStudyMember(user, study)) {
             return true;
@@ -166,7 +236,6 @@ public class StudyService {
             return false;
         }
     }
-
 
         public void enrollmentRequest(Long studyId, User user) {
         Study study = findStudyById(studyId);
@@ -233,6 +302,7 @@ public class StudyService {
         }
     }
 
+    @Transactional(readOnly = true)
     public int countActiveMember(Study study) {
         int count = 0;
         for (StudyMember member : study.getMembers()) {
@@ -241,5 +311,25 @@ public class StudyService {
             }
         }
         return count;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Study> findByPublished(SearchConditions searchConditions, int offset, int limit) {
+        return studyQueryRepository.findByPublished(searchConditions, offset, limit);
+    }
+
+    @Transactional(readOnly = true)
+    public long countByPublished(SearchConditions searchConditions) {
+        return studyQueryRepository.countByPublished(searchConditions);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Study> findByPublishedPage(SearchConditions searchConditions, int offset, int limit) {
+        return studyQueryRepository.findByPublishedPage(searchConditions, offset, limit);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Study> findAll(int offset, int limit) {
+        return studyQueryRepository.findAll(offset, limit);
     }
 }
