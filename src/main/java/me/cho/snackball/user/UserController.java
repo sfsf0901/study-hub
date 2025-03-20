@@ -3,6 +3,11 @@ package me.cho.snackball.user;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import me.cho.snackball.study.StudyQueryRepository;
+import me.cho.snackball.study.domain.Study;
+import me.cho.snackball.studyComment.StudyCommentRepository;
+import me.cho.snackball.studyPost.StudyPostRepository;
+import me.cho.snackball.studyPostComment.StudyPostCommentRepository;
 import me.cho.snackball.user.domain.User;
 import me.cho.snackball.global.security.CurrentUser;
 import me.cho.snackball.user.dto.EmailLoginForm;
@@ -16,6 +21,8 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class UserController {
@@ -23,6 +30,10 @@ public class UserController {
     private final SignUpFormValidator signUpFormValidator;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final StudyQueryRepository studyQueryRepository;
+    private final StudyPostRepository studyPostRepository;
+    private final StudyCommentRepository studyCommentRepository;
+    private final StudyPostCommentRepository studyPostCommentRepository;
 
 
     @InitBinder("signUpForm")
@@ -113,15 +124,84 @@ public class UserController {
 
     @GetMapping("/profile/{nickname}")
     public String viewProfile(@PathVariable String nickname, Model model, @CurrentUser User user) {
-
         User findUser = userRepository.findByNickname(nickname).orElseThrow(() -> new IllegalArgumentException(nickname + "에 해당하는 사용자가 없습니다."));
 
         model.addAttribute("profileImage", findUser.getProfileImage());
         model.addAttribute("profile", new Profile(findUser));
         model.addAttribute("isOwner", findUser.equals(user));
 
-        
-        return "user/profileView";
+        long countCreatedStudy = studyQueryRepository.countByPublishedAndManager(findUser);
+        long countParticipatingStudy = studyQueryRepository.countByPublishedAndMember(findUser);
+        Long countStudyPost = studyPostRepository.countByUser(findUser);
+        Long countStudyComment = studyCommentRepository.countByUser(findUser);
+        Long countStudyPostComment = studyPostCommentRepository.countByUser(findUser);
+
+        model.addAttribute("countCreatedStudy", countCreatedStudy);
+        model.addAttribute("countParticipatingStudy", countParticipatingStudy);
+        model.addAttribute("countStudyPost", countStudyPost);
+        model.addAttribute("countComment", countStudyComment + countStudyPostComment);
+
+        return "user/viewProfile";
     }
 
+    @GetMapping("/profile/{nickname}/created")
+    public String viewProfileWithCreatedStudy(@PathVariable String nickname,
+                                              @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                              @RequestParam(value = "limit", defaultValue = "9") int limit,
+                                              Model model, @CurrentUser User user) {
+        User findUser = userRepository.findByNickname(nickname).orElseThrow(() -> new IllegalArgumentException(nickname + "에 해당하는 사용자가 없습니다."));
+
+        boolean isOwner = findUser.equals(user);
+        model.addAttribute("profileImage", findUser.getProfileImage());
+        model.addAttribute("profile", new Profile(findUser));
+        model.addAttribute("isOwner", isOwner);
+
+        List<Study> studies;
+        Long totalElements;
+        if (isOwner) {
+            studies = studyQueryRepository.findByManager(findUser, offset, limit);
+            totalElements = studyQueryRepository.countByManager(findUser);
+        } else {
+            studies = studyQueryRepository.findByPublishedAndManager(findUser, offset, limit);
+            totalElements = studyQueryRepository.countByPublishedAndManager(findUser);
+        }
+
+        int currentPage = (offset / limit) + 1;
+        int totalPages = (int) Math.ceil((double) totalElements / limit);
+
+        model.addAttribute("studies", studies);
+        model.addAttribute("countStudy", totalElements);
+        model.addAttribute("currentPage", currentPage);  // 현재 페이지
+        model.addAttribute("totalPages", totalPages);  // 전체 페이지 수
+        model.addAttribute("limit", limit);
+
+        return "user/viewProfileWithCreatedStudy";
+    }
+
+    @GetMapping("/profile/{nickname}/participating")
+    public String viewProfileWithParticipatingStudy(@PathVariable String nickname,
+                                              @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                              @RequestParam(value = "limit", defaultValue = "9") int limit,
+                                              Model model, @CurrentUser User user) {
+        User findUser = userRepository.findByNickname(nickname).orElseThrow(() -> new IllegalArgumentException(nickname + "에 해당하는 사용자가 없습니다."));
+
+        boolean isOwner = findUser.equals(user);
+        model.addAttribute("profileImage", findUser.getProfileImage());
+        model.addAttribute("profile", new Profile(findUser));
+        model.addAttribute("isOwner", isOwner);
+
+        List<Study> studies = studyQueryRepository.findByPublishedAndMember(findUser, offset, limit);
+        Long totalElements = studyQueryRepository.countByPublishedAndMember(findUser);
+
+        int currentPage = (offset / limit) + 1;
+        int totalPages = (int) Math.ceil((double) totalElements / limit);
+
+        model.addAttribute("studies", studies);
+        model.addAttribute("countStudy", totalElements);
+        model.addAttribute("currentPage", currentPage);  // 현재 페이지
+        model.addAttribute("totalPages", totalPages);  // 전체 페이지 수
+        model.addAttribute("limit", limit);
+
+        return "user/viewProfileWithParticipatingStudy";
+    }
 }

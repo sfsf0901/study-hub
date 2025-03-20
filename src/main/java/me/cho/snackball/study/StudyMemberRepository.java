@@ -10,4 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> {
 
     StudyMember findByStudyAndUser(Study study, User user);
+
+    Long countByStudyAndActiveTrue(Study study);
 }

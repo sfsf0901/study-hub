@@ -2,6 +2,7 @@ package me.cho.snackball.main;
 
 import lombok.RequiredArgsConstructor;
 import me.cho.snackball.global.security.CurrentUser;
+import me.cho.snackball.study.StudyMemberRepository;
 import me.cho.snackball.study.StudyQueryRepository;
 import me.cho.snackball.study.StudyService;
 import me.cho.snackball.study.domain.Study;
@@ -21,7 +22,7 @@ import java.util.List;
 public class MainController {
 
     private final StudyService studyService;
-    private final StudyQueryRepository studyQueryRepository;
+    private final StudyMemberRepository studyMemberRepository;
 
     @GetMapping("/")
     public String homeTest(@ModelAttribute SearchConditions searchConditions,

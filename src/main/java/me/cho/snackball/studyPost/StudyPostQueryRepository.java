@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import me.cho.snackball.studyPost.domain.QStudyPost;
 import me.cho.snackball.studyPost.domain.StudyPost;
+import me.cho.snackball.user.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -15,6 +16,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
+import static me.cho.snackball.study.domain.QStudy.study;
 import static me.cho.snackball.studyPost.domain.QStudyPost.studyPost;
 import static me.cho.snackball.user.domain.QUser.*;
 

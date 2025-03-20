@@ -22,22 +22,22 @@
                     <div class="card p-5">
                         <div class="row text-center">
                             <div class="col-3">
-                                <div class="h1">0</div>
+                                <div class="h1"><span th:text="${countCreatedStudy}"></span></div>
                                 <div class="text-muted">만든 스터디</div>
                             </div>
 
                             <div class="col-3">
-                                <div class="h1">0</div>
+                                <div class="h1"><span th:text="${countParticipatingStudy}"></span></div>
                                 <div class="text-muted">가입한 스터디</div>
                             </div>
 
                             <div class="col-3">
-                                <div class="h1">1</div>
+                                <div class="h1"><span th:text="${countStudyPost}"></span></div>
                                 <div class="text-muted">작성한 글</div>
                             </div>
 
                             <div class="col-3">
-                                <div class="h1">0</div>
+                                <div class="h1"><span th:text="${countComment}"></span></div>
                                 <div class="text-muted">작성한 댓글</div>
                             </div>
                         </div>

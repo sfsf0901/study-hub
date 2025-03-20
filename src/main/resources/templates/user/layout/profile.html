@@ -43,7 +43,7 @@
 
         </div>
 
-        <div class="text-center">
+        <div class="text-center" th:if="${isOwner}">
             <a class="btn btn-primary d-grid" th:href="@{/settings/profile}" role="button">프로필 수정</a>
         </div>
 

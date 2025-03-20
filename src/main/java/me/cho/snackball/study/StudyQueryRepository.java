@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import me.cho.snackball.study.domain.Study;
 import me.cho.snackball.study.dto.SearchConditions;
+import me.cho.snackball.user.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -28,7 +29,7 @@ public class StudyQueryRepository {
     public List<Study> findByPublished(SearchConditions searchConditions, int offset, int limit) {
         return queryFactory
                 .selectFrom(study)
-                .where(study.published.eq(true)
+                .where(study.published.isTrue()
                         .and(studyContains(searchConditions.getKeyword()))
                         .or(studyTagContains(searchConditions.getKeyword()))
                         .or(studyLocationContains(searchConditions.getKeyword()))
@@ -44,7 +45,7 @@ public class StudyQueryRepository {
         Long count = queryFactory
                 .select(study.count())  // count() 사용
                 .from(study)
-                .where(study.published.eq(true)
+                .where(study.published.isTrue()
                         .and(studyContains(searchConditions.getKeyword()))
                         .or(studyTagContains(searchConditions.getKeyword()))
                         .or(studyLocationContains(searchConditions.getKeyword()))
@@ -54,6 +55,83 @@ public class StudyQueryRepository {
                 .fetchOne();
 
         return count != null ? count : 0;
+    }
+
+    public List<Study> findByManager(User user, int offset, int limit) {
+        return queryFactory
+                .selectFrom(study)
+                .where(studyManagerEq(user))
+                .offset(offset)
+                .limit(limit)
+                .fetch();
+    }
+
+    public long countByManager(User user) {
+        Long count = queryFactory
+                .select(study.count())  // count() 사용
+                .from(study)
+                .where(studyManagerEq(user))
+                .fetchOne();
+
+        return count != null ? count : 0;
+    }
+
+    public List<Study> findByPublishedAndManager(User user, int offset, int limit) {
+        return queryFactory
+                .selectFrom(study)
+                .where(study.published.isTrue(),
+                        studyManagerEq(user)
+                )
+                .offset(offset)
+                .limit(limit)
+                .fetch();
+    }
+
+    public long countByPublishedAndManager(User user) {
+        Long count = queryFactory
+                .select(study.count())  // count() 사용
+                .from(study)
+                .where(study.published.isTrue(),
+                        studyManagerEq(user)
+                )
+                .fetchOne();
+
+        return count != null ? count : 0;
+    }
+
+    public List<Study> findByPublishedAndMember(User user, int offset, int limit) {
+        return queryFactory
+                .selectFrom(study)
+                .where(study.published.isTrue(),
+                        study.members.any().active.isTrue(),
+                        studyMemberEq(user)
+                )
+                .offset(offset)
+                .limit(limit)
+                .fetch();
+    }
+
+    public long countByPublishedAndMember(User user) {
+        Long count = queryFactory
+                .select(study.count())  // count() 사용
+                .from(study)
+                .where(study.published.isTrue(),
+                        study.members.any().active.isTrue(),
+                        studyMemberEq(user)
+                )
+                .fetchOne();
+
+        return count != null ? count : 0;
+    }
+
+
+
+    private BooleanExpression studyManagerEq(User user) {
+        return user != null ? study.managers.any().user.eq(user) : null;
+    }
+
+    private BooleanExpression studyMemberEq(User user) {
+        return user != null ? study.members.any().user.eq(user) : null;
     }
 
     public Page<Study> findByPublishedPage(SearchConditions searchConditions, int page, int limit) {
@@ -108,4 +186,6 @@ public class StudyQueryRepository {
     private BooleanExpression studyLocationContains(String location) {
         return StringUtils.hasText(location) ? study.studyLocations.any().city.containsIgnoreCase(location.trim()) : null;
     }
+
+
 }

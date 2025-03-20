@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import me.cho.snackball.location.domain.Location;
 import me.cho.snackball.location.domain.QUserLocation;
+import me.cho.snackball.study.dto.SearchConditions;
 import me.cho.snackball.studyTag.domain.QUserStudyTag;
 import me.cho.snackball.studyTag.domain.StudyTag;
 import me.cho.snackball.user.domain.QUser;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static me.cho.snackball.location.domain.QUserLocation.*;
+import static me.cho.snackball.study.domain.QStudy.study;
 import static me.cho.snackball.studyTag.domain.QUserStudyTag.*;
 import static me.cho.snackball.user.domain.QUser.*;
 
@@ -34,4 +36,5 @@ public class UserQueryRepository {
                         ,userLocation.location.in(locations))
                 .fetch();
     }
+
 }

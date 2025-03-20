@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="~{layout/fragments.html :: head}"></head>
+
+<body>
+    <div th:replace="~{layout/fragments.html :: main-nav}"></div>
+
+    <div class="container">
+        <div class="row justify-content-center my-5">
+            <div class="col-3 me-5">
+                <div th:replace="~{user/layout/profile.html :: profile}"></div>
+            </div>
+
+            <div class="col-7">
+                <div class="row">
+                    <div th:replace="~{user/layout/profileNav.html :: profileNav(currentMenu='participating')}"></div>
+                </div>
+
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-3 g-3 mt-3">
+                    <div class="col d-flex" th:each="study : ${studies}">
+                        <div class="card" style="width: 18rem;">
+                            <a th:href="@{/study/{id}(id=${study.id})}">
+                                <img th:src="${study.thumbnailUrl}" class="card-img-top" alt="..." style="height: 150px; object-fit: cover;">
+                            </a>
+                            <div class="card-body">
+                                <div class="title">
+                                    <a th:href="@{/study/{id}(id=${study.id})}" style="text-decoration: none; color: inherit;">
+                                        <h5 th:text="*{study.title}"></h5>
+                                    </a>
+                                </div>
+
+                                <div class="tags">
+                            <span th:each="studyTag : *{study.studyStudyTags}" class="badge rounded-pill text-bg-info me-1">
+                                <!-- 'data-tag' 속성에 studyTag.name을 저장하고 -->
+                                <a href="#" th:attr="data-tag=${studyTag.name}" onclick="searchHandler(event, '', this.dataset.tag, '')" style="text-decoration: none; color: inherit;">
+                                    # <span th:text="*{studyTag.name}">Tag Name</span>
+                                </a>
+                            </span>
+                                </div>
+
+                                <div class="locations">
+                            <span th:each="studyLocation : *{study.studyLocations}" class="badge rounded-pill text-bg-primary me-1">
+                                <!-- 'data-location' 속성에 studyLocation.city를 저장하고 -->
+                                <a href="#" th:attr="data-location=${studyLocation.city}" onclick="searchHandler(event, '', '', this.dataset.location)" style="text-decoration: none; color: inherit;">
+                                    # <span th:text="*{studyLocation.city}">Tag Name</span>
+                                </a>
+                            </span>
+                                </div>
+
+                                <div class="info d-flex justify-content-between mt-3">
+                                    <div class="member-count">
+                                        <!--                                <small class="text-muted"><i class="fa-solid fa-user"></i></small>-->
+                                        <!--                                <small class="text-muted" th:text="*{study.members.size() + 1}"></small>-->
+                                    </div>
+                                    <div class="published-date">
+                                        <small class="text-muted" th:text="${#temporals.format(study.publishedDate, 'yyyy-MM-dd')}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${studies.size() > 0}" class="row justify-content-center my-5">
+                    <div class="col-10">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination pagination-sm justify-content-center">
+                                <!-- 이전 페이지 -->
+                                <li class="page-item" th:classappend="${currentPage == 1}? 'disabled'">
+                                    <a th:href="@{'/profile/'+ ${profile.nickname} + '/created?offset=' + (${currentPage - 2} * ${limit}) + '&limit=' + ${limit}}"
+                                       class="page-link">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+
+                                <!-- 페이지 번호 -->
+                                <li class="page-item" th:classappend="${i == currentPage}? 'active'"
+                                    th:each="i : ${#numbers.sequence(1, totalPages)}">
+                                    <a th:href="@{'/profile/'+ ${profile.nickname} + '/created?offset=' + ((${i} - 1) * ${limit}) + '&limit=' + ${limit}}"
+                                       class="page-link" th:text="${i}"></a>
+                                </li>
+
+                                <!-- 다음 페이지 -->
+                                <li class="page-item" th:classappend="${currentPage >= totalPages}? 'disabled'">
+                                    <a th:href="@{'/profile/'+ ${profile.nickname} + '/created?offset=' + (${currentPage} * ${limit}) + '&limit=' + ${limit}}"
+                                       class="page-link">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>

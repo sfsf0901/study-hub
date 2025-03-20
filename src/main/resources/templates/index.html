@@ -98,8 +98,8 @@
 
                         <div class="info d-flex justify-content-between mt-3">
                             <div class="member-count">
-                                <small class="text-muted"><i class="fa-solid fa-user"></i></small>
-                                <small class="text-muted" th:text="*{study.members.size() + 1}"></small>
+<!--                                <small class="text-muted"><i class="fa-solid fa-user"></i></small>-->
+<!--                                <small class="text-muted" th:text="*{study.members.size() + 1}"></small>-->
                             </div>
                             <div class="published-date">
                                 <small class="text-muted" th:text="${#temporals.format(study.publishedDate, 'yyyy-MM-dd')}"></small>
@@ -161,12 +161,22 @@
 
         // 검색어, 태그, 지역에 대한 검색 처리
         function searchHandler(event, keyword, tag, location) {
-            let url = "/?keyword=" + encodeURIComponent(keyword)
-                + "&tag=" + encodeURIComponent(tag)
-                + "&location=" + encodeURIComponent(location)
-                + "&page=1&limit=20";  // 첫 페이지로 이동하도록 설정
+            event.preventDefault();  // 기본 동작 방지
 
-            window.location.href = url;  // 페이지 이동
+            let url = "/?";
+
+            if (keyword && keyword.trim() !== "") {
+                url += "keyword=" + encodeURIComponent(keyword) + "&";
+            }
+            if (tag && tag.trim() !== "undefined") {
+                url += "tag=" + encodeURIComponent(tag) + "&";
+            }
+            if (location && location.trim() !== "undefined") {
+                url += "location=" + encodeURIComponent(location) + "&";
+            }
+
+            url += "page=1&limit=20";  // 첫 페이지로 이동하도록 설정
+            window.location.href = url;
         }
     </script>
 </body>
