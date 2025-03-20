@@ -27,9 +27,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class StudyController {
 
-    private final StudyRepository studyRepository;
     private final StudyService studyService;
-    private final StudyManagerRepository studyManagerRepository;
     private final StudyMemberRepository studyMemberRepository;
     private final StudyTagService studyTagService;
     private final LocationService locationService;
@@ -37,6 +35,10 @@ public class StudyController {
 
     @GetMapping("/study/create")
     public String createStudyForm(@CurrentUser User user, Model model) {
+        if (user == null) {
+            return "redirect:/login";
+        }
+
         model.addAttribute("profileImage", user.getProfileImage());
         model.addAttribute(new CreateStudyForm());
         model.addAttribute("studyTags", studyTagService.getStudyTagNames());

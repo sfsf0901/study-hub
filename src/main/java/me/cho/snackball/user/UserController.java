@@ -36,8 +36,9 @@ public class UserController {
     private final StudyPostCommentRepository studyPostCommentRepository;
 
 
-    @InitBinder("signUpForm")
+    @InitBinder("signupForm")
     public void initBinder(WebDataBinder binder) {
+        System.out.println("########initBinder 실행됨");
         binder.addValidators(signUpFormValidator);
     }
 
@@ -48,9 +49,10 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public String signUp(@Valid @ModelAttribute SignupForm signupForm, BindingResult bindingResult, Model model, HttpServletRequest request) {
+    public String signUp(@Valid @ModelAttribute("signupForm") SignupForm signupForm, BindingResult bindingResult, Model model, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute(signupForm);
+            System.out.println("회원가입 실패: " + bindingResult.getAllErrors()); // 로그 출력
+            model.addAttribute("signupForm", signupForm);
             return "user/signup";
         }
 
@@ -192,6 +194,7 @@ public class UserController {
 
         List<Study> studies = studyQueryRepository.findByPublishedAndMember(findUser, offset, limit);
         Long totalElements = studyQueryRepository.countByPublishedAndMember(findUser);
+        System.out.println("########totalElements = " + totalElements);
 
         int currentPage = (offset / limit) + 1;
         int totalPages = (int) Math.ceil((double) totalElements / limit);

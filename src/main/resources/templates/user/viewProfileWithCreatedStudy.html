@@ -94,6 +94,13 @@
                     </div>
                 </div>
 
+                <div th:if="${countStudy == 0}" class="alert alert-light my-5" role="alert" style="width: 50%; margin: 0 auto;">
+                    <div class="d-flex flex-column align-items-center justify-content-center text-center">
+                        <i class="fa-solid fa-triangle-exclamation h2"></i>
+                        <h5 class="mt-2">만든 스터디가 없습니다.</h5>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

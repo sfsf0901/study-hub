@@ -15,6 +15,7 @@ public class SignUpFormValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
+        System.out.println("🔍 supports() 실행됨: " + clazz.getName()); // 로그 추가
         return SignupForm.class.isAssignableFrom(clazz);
     }
 
@@ -23,9 +24,11 @@ public class SignUpFormValidator implements Validator {
         SignupForm signUpForm = (SignupForm) target;
 
         if (userRepository.existsByUsername(signUpForm.getUsername())) {
-            errors.rejectValue("email", "invalid.email", new Object[]{signUpForm.getUsername()}, "이미 사용중인 이메일입니다.");
+            System.out.println("########중복된 이메일입니다: " + signUpForm.getUsername());
+            errors.rejectValue("username", "invalid.username", new Object[]{signUpForm.getUsername()}, "이미 사용중인 이메일입니다.");
         }
         if (userRepository.existsByNickname(signUpForm.getNickname())) {
+            System.out.println("########중복된 닉네임입니다: " + signUpForm.getNickname());
             errors.rejectValue("nickname", "invalid.nickname", new Object[]{signUpForm.getNickname()}, "이미 사용중인 닉네임입니다.");
         }
     }

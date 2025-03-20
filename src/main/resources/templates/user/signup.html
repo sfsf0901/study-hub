@@ -28,6 +28,7 @@
           <small id="nicknameHelp" class="form-text text-muted">
             공백없이 문자와 숫자로만 3자 이상 20자 이내
           </small>
+          <br>
           <small class="invalid-feedback">닉네임을 입력하세요.</small>
           <small class="form-text text-danger" th:errors="*{nickname}">Nickname Error</small>
         </div>
@@ -39,8 +40,9 @@
           <small id="passwordHelp" class="form-text text-muted">
             영문자, 숫자, 특수기호로 8자 이상 50자 이내
           </small>
+          <br>
           <small class="invalid-feedback">비밀번호를 입력하세요.</small>
-          <small class="form-text text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</small>
+          <small class="form-text text-danger" th:errors="*{password}">Password Error</small>
         </div>
 
         <div class="form-group d-grid gap-2 mb-2">
