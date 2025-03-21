@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/fragments.html :: head}">
-    <meta name="_csrf" th:content="${_csrf.token}" />
-    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 
 <body>
@@ -17,7 +15,6 @@
             <form class="needs-validation col-sm-10"
                   th:action="@{/study/{studyId}/board/{studyPostId}/update(studyId=${study.id}, studyPostId=${updateStudyPostForm.studyPostId})}"
                   th:object="${updateStudyPostForm}" method="post" novalidate>
-                <input type="hidden" th:field="*{studyPostId}" />
                 <div class="form-group mb-3">
                     <label for="title" class="mb-2">제목</label>
                     <input id="title" name="title" type="text" th:field="*{title}" class="form-control"
@@ -42,8 +39,9 @@
 
             </form>
         </div>
-
     </div>
+
+    <div th:replace="~{layout/fragments.html :: footer}"></div>
 
     <script type="application/javascript">
         (function () {

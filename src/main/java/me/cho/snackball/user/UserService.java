@@ -100,7 +100,7 @@ public class UserService {
 
         Context context = new Context();
         context.setVariable("nickname", user.getNickname());
-        context.setVariable("message1", "SNACKBALL의 회원이 되셨습니다. 회원님의 ID는 " + user.getUsername() +"입니다.");
+        context.setVariable("message1", "스카의 회원이 되셨습니다. 회원님의 ID는 " + user.getUsername() +"입니다.");
         context.setVariable("message2", "이메일 주소를 인증하려면 링크 클릭:");
         context.setVariable("host", appProperties.getHost());
         context.setVariable("link", "/checkemailtoken?token=" + user.getEmailCheckToken() + "&email=" + user.getUsername());
@@ -111,7 +111,7 @@ public class UserService {
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(user.getUsername());
-            mimeMessageHelper.setSubject("SNACKBALL 이메일 인증");
+            mimeMessageHelper.setSubject("[스카] 이메일 인증");
             mimeMessageHelper.setText(htmlMessage, true);
             javaMailSender.send(mimeMessage);
         } catch (MessagingException e) {
@@ -144,7 +144,7 @@ public class UserService {
 
         Context context = new Context();
         context.setVariable("nickname", user.getNickname());
-        context.setVariable("message1", "SNACKBALL의 ID " + user.getUsername() + "로 로그인 링크를 요청하셨습니다.");
+        context.setVariable("message1", "스카의 ID " + user.getUsername() + "로 로그인 링크를 요청하셨습니다.");
         context.setVariable("message2", "로그인하려면 링크 클릭:");
         context.setVariable("host", appProperties.getHost());
         context.setVariable("link", "/loginbyemail?token=" + user.getEmailCheckToken() + "&email=" + user.getUsername());
@@ -154,7 +154,7 @@ public class UserService {
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(user.getUsername());
-            mimeMessageHelper.setSubject("SNACKBALL 로그인");
+            mimeMessageHelper.setSubject("[스카] 로그인");
             mimeMessageHelper.setText(htmlMessage, true);
             javaMailSender.send(mimeMessage);
         } catch (MessagingException e) {

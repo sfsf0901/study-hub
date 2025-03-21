@@ -88,7 +88,7 @@ public class StudyEventListener {
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(user.getUsername());
-            mimeMessageHelper.setSubject("[SNACKBALL] 새로운 스터디가 민들어졌어요");
+            mimeMessageHelper.setSubject("[스카] 새로운 스터디가 민들어졌어요");
             mimeMessageHelper.setText(htmlMessage, true);
             javaMailSender.send(mimeMessage);
         } catch (MessagingException e) {
@@ -123,7 +123,7 @@ public class StudyEventListener {
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(user.getUsername());
-            mimeMessageHelper.setSubject("[SNACKBALL] 스터디 가입 신청이 완료됐어요");
+            mimeMessageHelper.setSubject("[스카] 스터디 가입 신청이 완료됐어요");
             mimeMessageHelper.setText(htmlMessage, true);
             javaMailSender.send(mimeMessage);
         } catch (MessagingException e) {
@@ -148,14 +148,14 @@ public class StudyEventListener {
                 NotificationType.ENROLLMENT_ACCEPTED);
 
         if (notification == null) {
-            log.error("🚨 Notification.create() 결과가 null입니다! 알림이 생성되지 않음.");
+            log.error("Notification.create() 결과가 null입니다! 알림이 생성되지 않음.");
             return;
         }
 
         notificationRepository.save(notification);
-        notificationRepository.flush(); // ✅ 강제로 DB 반영 (즉시 저장)
+        notificationRepository.flush(); // 강제로 DB 반영 (즉시 저장)
 
-        log.info("✅ 알림 저장됨: notificationId={}", notification.getId());
+        log.info("알림 저장됨: notificationId={}", notification.getId());
     }
 
 }

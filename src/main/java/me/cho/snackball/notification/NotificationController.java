@@ -24,6 +24,8 @@ public class NotificationController {
 
     @GetMapping("/notifications/new")
     public String getNewNotifications(@CurrentUser User user, Model model) {
+        model.addAttribute("profileImage", user.getProfileImage());
+
         List<Notification> notifications = notificationRepository.findByUserAndCheckedOrderByCreatedDateDesc(user, false);
         long totalCount = notificationRepository.countByUser(user);
         long numberOfNotChecked = notificationRepository.countByUserAndChecked(user, false);
@@ -36,6 +38,8 @@ public class NotificationController {
 
     @GetMapping("/notifications")
     public String getNotifications(@CurrentUser User user, Model model) {
+        model.addAttribute("profileImage", user.getProfileImage());
+
         List<Notification> notifications = notificationRepository.findByUserOrderByCreatedDateDesc(user);
         long totalCount = notificationRepository.countByUser(user);
         long numberOfNotChecked = notificationRepository.countByUserAndChecked(user, false);
