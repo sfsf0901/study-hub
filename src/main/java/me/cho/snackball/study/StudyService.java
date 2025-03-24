@@ -201,6 +201,11 @@ public class StudyService {
         study.setClosedDate(LocalDateTime.now());
     }
 
+    public void deleteStudy(User user, Long studyId) {
+        Study study = getStudyToUpdate(user, studyId);
+        studyRepository.delete(study);
+    }
+
     @Transactional(readOnly = true)
     public Study getStudyToUpdate(User user, Long studyId) {
         Study study = findStudyById(studyId);

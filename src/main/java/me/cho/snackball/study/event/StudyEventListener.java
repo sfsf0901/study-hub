@@ -133,11 +133,11 @@ public class StudyEventListener {
 
     private void sendEnrollmentAcceptNotification(Study study, User user) {
         if (study == null || user == null) {
-            log.error("🚨 study 또는 user가 null입니다! study={}, user={}", study, user);
+            log.error("study 또는 user가 null입니다! study={}, user={}", study, user);
             return; // study나 user가 null이면 알림을 만들지 않음
         }
 
-        log.info("✅ 알림 생성 시작: study={}, user={}", study.getTitle(), user.getNickname());
+        log.info("알림 생성 시작: study={}, user={}", study.getTitle(), user.getNickname());
 
         Notification notification = Notification.create(
                 "스터디 가입 신청이 완료됐어요",

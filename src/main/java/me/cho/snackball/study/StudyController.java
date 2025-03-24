@@ -64,8 +64,8 @@ public class StudyController {
 
     @GetMapping("/study/{studyId}/update")
     public String updateStudyForm(@PathVariable("studyId") Long studyId,
-                                @CurrentUser User user,
-                                Model model) {
+                                  @CurrentUser User user,
+                                  Model model) {
         model.addAttribute("profileImage", user.getProfileImage());
 
         Study study = studyService.getStudyToUpdate(user, studyId);
@@ -136,8 +136,8 @@ public class StudyController {
 
     @GetMapping("/study/{studyId}/members")
     public String viewStudyMembers(@PathVariable("studyId") Long studyId,
-                            @CurrentUser User user,
-                            Model model) {
+                                   @CurrentUser User user,
+                                   Model model) {
         Study study = studyService.findStudyById(studyId);
         if (!study.isPublished() && !studyService.isStudyManager(user, study)) {
             throw new IllegalStateException("해당 스터디에 접근 권한이 없습니다. studyId: " + studyId);
@@ -164,8 +164,8 @@ public class StudyController {
 
     @GetMapping("/study/{studyId}/settings/study")
     public String updateStudyStatusForm(@PathVariable("studyId") Long studyId,
-                                  @CurrentUser User user,
-                                  Model model) {
+                                        @CurrentUser User user,
+                                        Model model) {
         model.addAttribute("profileImage", user.getProfileImage());
 
         Study study = studyService.getStudyToUpdate(user, studyId);
@@ -202,8 +202,8 @@ public class StudyController {
     @PostMapping("/study/{studyId}/updateRecruiting")
     @ResponseBody
     public ResponseEntity<Map<String, String>> updateRecruitingStatus(@PathVariable Long studyId,
-                                                                     @RequestBody Map<String, Boolean> request,
-                                                                     @CurrentUser User user) {
+                                                                      @RequestBody Map<String, Boolean> request,
+                                                                      @CurrentUser User user) {
         Boolean isRecruiting = request.get("recruiting");
         if (isRecruiting == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid payload"));
@@ -227,5 +227,12 @@ public class StudyController {
         studyService.updateClosedStatus(user, studyId, isClosed);
 
         return ResponseEntity.ok(Map.of("message", "스터디 종료 상태가 업데이트되었습니다."));
+    }
+
+    @PostMapping("/study/{studyId}/delete")
+    public String deleteStudy(@PathVariable Long studyId, @CurrentUser User user) {
+        studyService.deleteStudy(user, studyId);
+
+        return "redirect:/";
     }
 }

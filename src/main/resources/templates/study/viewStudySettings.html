@@ -93,7 +93,13 @@
                             <span>스터디를 삭제하면 스터디와 관련된 모든 기록이 함께 삭제되며 복구할 수 없습니다.</span>
                         </div>
                         <div class="d-flex align-items-center">
-                            <a th:href="@{/study/{id}/delete(id=${study.id})}" class="btn btn-outline-danger">삭제하기</a>
+                            <form action="#" method="POST" id="deleteForm">
+                                <input type="hidden" name="_csrf" th:value="${_csrf.token}" /> <!-- CSRF 토큰 -->
+                                <button type="button" class="btn btn-outline-danger"
+                                        th:attr="data-study-id=${study.id}" onclick="deleteStudy(this)">삭제하기</button>
+                            </form>
+
+
                         </div>
                     </div>
                 </div>
@@ -260,6 +266,60 @@
                     alert('스터디 종료 상태를 업데이트하는 중 문제가 발생했습니다.');
                     // 오류 발생 시 체크박스 상태 복구
                     document.getElementById('Notclosed').checked = false;
+                });
+        }
+    </script>
+    <script>
+        function deleteStudy(button) {
+            const studyId = button.getAttribute('data-study-id');
+
+            if (!studyId) {
+                alert('스터디 ID가 누락되었습니다.');
+                return;
+            }
+
+            // 확인 메시지 표시
+            const userConfirmed = confirm("정말로 이 스터디를 삭제하시겠습니까? 삭제된 스터디는 복구할 수 없습니다.");
+
+            if (!userConfirmed) {
+                return; // 사용자가 취소를 클릭하면 함수 종료
+            }
+
+            const form = document.getElementById('deleteForm');
+            const url = `/study/${studyId}/delete`;
+            form.action = url;
+
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken,
+                },
+                body: JSON.stringify({})
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to delete study');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    console.log('Response:', data);
+
+                    if (data.includes('Forbidden')) {
+                        alert('권한이 없습니다. 관리자에게 문의하세요.');
+                    } else {
+                        alert("스터디가 삭제되었습니다.");
+                        // 클라이언트 측에서 리디렉션 처리
+                        window.location.href = '/';  // 홈 화면으로 리디렉션
+                    }
+                })
+                .catch(error => {
+                    alert('삭제 실패');
+                    console.error(error);
                 });
         }
     </script>
