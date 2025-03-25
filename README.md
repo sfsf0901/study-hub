@@ -29,8 +29,7 @@
 <br>
 
 ## 📐 ERD
-![Image](https://github.com/user-attachments/assets/4b664b40-1ccc-4ff4-91ea-cb7013cf7fba)
-<br>
+![Image](https://github.com/user-attachments/assets/6605731e-f56c-4328-b745-9562d6e8e861)<br>
 
 ## 🛠️ 주요 기능
 ### 스터디
