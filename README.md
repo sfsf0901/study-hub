@@ -29,6 +29,7 @@
 <br>
 
 ## 📐 ERD
+![Image](https://github.com/user-attachments/assets/4b664b40-1ccc-4ff4-91ea-cb7013cf7fba)
 <br>
 
 ## 🛠️ 주요 기능
