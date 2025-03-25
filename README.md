@@ -1,3 +1,6 @@
+![Image](https://github.com/user-attachments/assets/23eca6ef-ab6b-4574-8669-b0f866396497)
+
+
 # 커밋 메시지 컨벤션
 - feat: 새로운 기능 추가
 - fix: 버그 수정
