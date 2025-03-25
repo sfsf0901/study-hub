@@ -28,8 +28,12 @@
 
 <br>
 
+## 🛠️ 시스템 아키텍처
+![Image](https://github.com/user-attachments/assets/5326d036-6318-46ee-a7a6-2972c911cd66)
+
 ## 📐 ERD
 ![Image](https://github.com/user-attachments/assets/6605731e-f56c-4328-b745-9562d6e8e861)<br>
+
 
 
 
