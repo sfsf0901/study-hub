@@ -37,8 +37,7 @@ out/
 .vscode/
 
 ### NPM ###
-node_modules/
-
+#node_modules/
 
 ### Ignore ###
 application.properties
