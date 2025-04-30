@@ -9,7 +9,7 @@ public class CorsMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000")
+                .allowedOrigins("https://skaa.p-e.kr")
                 .allowedMethods("GET", "POST", "PUT", "DELETE") // 요청 방식도 확인
                 .allowedHeaders("*") // 모든 헤더 허용
                 .allowCredentials(true); // 자격 증명 허용
