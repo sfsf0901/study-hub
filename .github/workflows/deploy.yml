@@ -22,6 +22,9 @@ jobs:
       - name: application.properties 파일 만들기
         run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
 
+      - name: MailConfig.java 파일 만들기
+        run: echo "${{ secrets.MAILCONFIG_JAVA }}" > ./src/main/java/me/cho/snackball/mail/MailConfig.java
+
       - name: 빌드하기
         run: ./gradlew clean build -x test
 
