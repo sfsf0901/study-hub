@@ -53,6 +53,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script_stop: true
           script: |
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 203918873461.dkr.ecr.ap-northeast-2.amazonaws.com
             cd /home/ubuntu/skaa-server
             docker compose pull
             docker compose up --build -d
