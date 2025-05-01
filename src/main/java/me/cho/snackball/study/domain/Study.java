@@ -26,7 +26,7 @@ public class Study extends BaseUserEntity {
     private String title;
 
     @Lob @Basic(fetch = FetchType.EAGER)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String fullDescription;
 
     private String thumbnailUrl;
