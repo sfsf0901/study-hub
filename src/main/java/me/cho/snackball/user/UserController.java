@@ -14,6 +14,7 @@ import me.cho.snackball.user.dto.EmailLoginForm;
 import me.cho.snackball.user.dto.LoginForm;
 import me.cho.snackball.user.dto.Profile;
 import me.cho.snackball.user.dto.SignupForm;
+import me.cho.snackball.user.validator.SignUpFormValidator;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;

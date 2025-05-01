@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import me.cho.snackball.study.domain.Study;
+import me.cho.snackball.study.validator.ValidLocations;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class UpdateStudyForm {
 
     private List<String> studyTags;
 
+    @ValidLocations
     private List<String> locations;
 
     @NotBlank

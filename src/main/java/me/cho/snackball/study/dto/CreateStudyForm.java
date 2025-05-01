@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import me.cho.snackball.study.validator.ValidLocations;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class CreateStudyForm {
 
     private List<String> studyTags;
 
+    @ValidLocations
     private List<String> locations;
 
 //    @NotBlank

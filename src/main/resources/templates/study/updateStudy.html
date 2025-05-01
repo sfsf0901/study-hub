@@ -7,164 +7,175 @@
 </head>
 
 <body>
-    <div th:replace="~{layout/fragments.html :: main-nav}"></div>
+<div th:replace="~{layout/fragments.html :: main-nav}"></div>
 
-    <div class="container py-5 ">
-        <div class="text-center mb-5">
-            <h2>스터디 수정하기</h2>
-        </div>
-
-        <div class="row justify-content-center">
-            <form class="needs-validation col-sm-10" th:action="@{/study/{id}/update(id=${updateStudyForm.studyId})}" th:object="${updateStudyForm}" method="post" novalidate>
-                <div class="form-group mb-3">
-                    <label for="title" class="mb-2">제목</label>
-                    <input id="title" name="title" type="text" th:field="*{title}" class="form-control"
-                           aria-describedby="titleHelp" required max="50">
-                    <small class="invalid-feedback">스터디 제목을 입력하세요</small>
-                    <small class="form-text text-danger" th:errors="*{title}">Title Error</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="whitelist1" class="mb-2">태그</label>
-                    <div id="whitelist1" th:text="${#strings.listJoin(studyTags, ',')}" hidden></div>
-                    <input type="text" name="inputStudyTags" th:value="${#strings.listJoin(updateStudyForm.studyTags,',')}"
-                           class="tagify--outside form-control mb-2" aria-describedby="tagHelp" placeholder="키워드를 입력하세요"/>
-                    <input type="hidden" name="studyTags" id="studyTags">
-                </div>
-                <div class="form-group mb-3">
-                    <div id="whitelist2" th:text="${#strings.listJoin(locations, ',')}" hidden></div>
-                    <input type="text" name="inputLocations" th:value="${#strings.listJoin(updateStudyForm.locations,',')}"
-                           class="tagify--outside form-control mb-2" aria-describedby="tagHelp" placeholder="활동 지역을 입력하세요"/>
-                    <input type="hidden" name="locations" id="locations">
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="limitOfEnrollment" class="mb-2">회원수</label>
-                    <small class="form-text text-muted">(*가입 가능한 최대 회원수를 입력하세요)</small>
-                    <div class="d-flex align-items-center">
-                        <input id="limitOfEnrollment" type="number" name="limitOfEnrollment"
-                               th:field="*{limitOfEnrollment}" class="form-control show-spinner"
-                               style="text-align:center; max-width: 100px;" required min="1" max="1000"/>
-                        <span class="ms-2">명</span>
-                    </div>
-                    <small class="invalid-feedback">회원수를 1명 이상 입력해주세요.</small>
-                    <small class="form-text text-danger" th:errors="*{limitOfEnrollment}">LimitOfEnrollment Error</small>
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="summernote" class="mb-2">소개</label>
-                    <textarea id="summernote" name="fullDescription" type="text" th:field="*{fullDescription}" class="form-control"
-                              aria-describedby="fullDescription" required></textarea>
-                    <small class="invalid-feedback">스터디 내용을 입력하세요</small>
-                    <small class="form-text text-danger" th:errors="*{fullDescription}">FullDescription Error</small>
-                </div>
-
-                <div class="form-group">
-<!--                    <button class="btn btn-primary btn-block mt-2" type="submit">취소</button>-->
-                    <button class="btn btn-primary btn-block mt-2" type="submit">저장</button>
-                </div>
-
-            </form>
-        </div>
+<div class="container py-5 ">
+    <div class="text-center mb-5">
+        <h2>스터디 수정하기</h2>
     </div>
 
-    <div th:replace="~{layout/fragments.html :: footer}"></div>
+    <div class="row justify-content-center">
+        <form class="needs-validation col-sm-10" th:action="@{/study/{id}/update(id=${updateStudyForm.studyId})}" th:object="${updateStudyForm}" method="post" novalidate>
+            <div class="form-group mb-3">
+                <label for="title" class="mb-2">제목</label>
+                <input id="title" name="title" type="text" th:field="*{title}" class="form-control"
+                       aria-describedby="titleHelp" required max="50">
+                <small class="invalid-feedback">스터디 제목을 입력하세요</small>
+                <small class="form-text text-danger" th:errors="*{title}">Title Error</small>
+            </div>
 
-    <script type="application/javascript">
-        (function () {
-            'use strict';
+            <div class="form-group">
+                <label for="whitelist1" class="mb-2">태그</label>
+                <div id="whitelist1" th:text="${#strings.listJoin(studyTags, ',')}" hidden></div>
+                <input type="text" name="inputStudyTags"
+                       class="tagify--outside form-control mb-2" aria-describedby="tagHelp" placeholder="키워드를 입력하세요"/>
+                <input type="hidden" name="studyTags" id="studyTags" th:field="*{studyTags}">
+            </div>
+            <div class="form-group mb-3">
+                <div id="whitelist2" th:text="${#strings.listJoin(locations, ',')}" hidden></div>
+                <input type="text" name="inputLocations"
+                       class="tagify--outside form-control mb-2" aria-describedby="tagHelp" placeholder="활동 지역을 입력하세요"/>
+                <input type="hidden" name="locations" id="locations" th:field="*{locations}">
+                <small class="form-text text-danger" th:errors="*{locations}">활동 지역을 형식에 맞게 입력해주세요.</small>
+            </div>
 
-            window.addEventListener('load', function () {
-                // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                var forms = document.getElementsByClassName('needs-validation');
+            <div class="form-group mb-3">
+                <label for="limitOfEnrollment" class="mb-2">회원수</label>
+                <small class="form-text text-muted">(*가입 가능한 최대 회원수를 입력하세요)</small>
+                <div class="d-flex align-items-center">
+                    <input id="limitOfEnrollment" type="number" name="limitOfEnrollment"
+                           th:field="*{limitOfEnrollment}" class="form-control show-spinner"
+                           style="text-align:center; max-width: 100px;" required min="1" max="1000"/>
+                    <span class="ms-2">명</span>
+                </div>
+                <small class="invalid-feedback">회원수를 1명 이상 입력해주세요.</small>
+                <small class="form-text text-danger" th:errors="*{limitOfEnrollment}">LimitOfEnrollment Error</small>
+            </div>
 
-                // Loop over them and prevent submission
-                Array.prototype.filter.call(forms, function (form) {
-                    form.addEventListener('submit', function (event) {
-                        if (form.checkValidity() === false) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-                        form.classList.add('was-validated')
-                    }, false)
-                })
-            }, false)
-        }())
-    </script>
+            <div class="form-group mb-3">
+                <label for="summernote" class="mb-2">소개</label>
+                <textarea id="summernote" name="fullDescription" type="text" th:field="*{fullDescription}" class="form-control"
+                          aria-describedby="fullDescription" required></textarea>
+                <small class="invalid-feedback">스터디 내용을 입력하세요</small>
+                <small class="form-text text-danger" th:errors="*{fullDescription}">FullDescription Error</small>
+            </div>
 
-    <script type="application/javascript">
-        $(document).ready(function() {
-            var input = document.querySelector('input[name=inputStudyTags]');
-            var hiddenTagField = document.querySelector('#studyTags');
+            <div class="form-group">
+                <!--                    <button class="btn btn-primary btn-block mt-2" type="submit">취소</button>-->
+                <button class="btn btn-primary btn-block mt-2" type="submit">저장</button>
+            </div>
 
-            var whitelistTags = document.querySelector("#whitelist1").innerText.split(",").map(tag => tag.trim());
+        </form>
+    </div>
+</div>
 
-            // Tagify 인스턴스 초기화
-            var tagify = new Tagify(input, {
-                whitelist: whitelistTags,
-                focusable: false,
-                dropdown: {
-                    position: 'input',
-                    maxItems: 10,
-                    enabled: 0 // always opens dropdown when input gets focus
-                }
-            });
+<div th:replace="~{layout/fragments.html :: footer}"></div>
 
-            // 태그 변경 시 hidden 필드 업데이트
-            tagify.on('change', function () {
-                // 배열 값만 설정 (중첩 배열 제거)
-                hiddenTagField.value = tagify.value.map(tag => tag.value).join(",");
-            });
-        });
-    </script>
+<script type="application/javascript">
+    (function () {
+        'use strict';
 
-    <script type="application/javascript">
-        $(document).ready(function() {
-            var locationInput = document.querySelector('input[name=inputLocations]');
-            var hiddenLocationField = document.querySelector('#locations');
+        window.addEventListener('load', function () {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
 
-            var whitelistLocations = document.querySelector("#whitelist2").innerText.split(",").map(location => location.trim());
-
-            var locationTagify = new Tagify(locationInput, {
-                whitelist: whitelistLocations,
-                dropdown: {
-                    position: 'input',
-                    maxItems: 10,
-                    enabled: 0,
-                },
-            });
-
-            // 태그 변경 시 hidden 필드 업데이트
-            locationTagify.on('change', function () {
-                // 배열 값만 설정 (중첩 배열 제거)
-                hiddenLocationField.value = locationTagify.value.map(location => location.value).join(",");
-            });
-        });
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Tooltip을 수동으로 활성화
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-        });
-    </script>
-
-    <script type="application/javascript">
-        $(document).ready(function() {
-            $('#summernote').summernote({
-                // tooltip: false,
-                fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Noto Sans KR', 'Merriweather'],
-                placeholder: '스터디의 목표, 일정, 진행 방식, 사용할 교재 또는 인터넷 강좌 그리고 모집중인 스터디원 등 스터디에 대해 자세히 적어 주세요.',
-                tabsize: 2,
-                height: 300
+            // Loop over them and prevent submission
+            Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated')
+                }, false)
             })
-        });
-    </script>
+        }, false)
+    }())
+</script>
 
-    <link rel="stylesheet" href="/node_modules/summernote/dist/summernote-bs5.min.css">
-    <script src="/node_modules/summernote/dist/summernote-bs5.min.js"></script>
+<script type="application/javascript">
+    $(document).ready(function() {
+        var input = document.querySelector('input[name=inputStudyTags]');
+        var hiddenTagField = document.querySelector('#studyTags');
+
+        var whitelistTags = document.querySelector("#whitelist1").innerText.split(",").map(tag => tag.trim());
+
+        // Tagify 인스턴스 초기화
+        var tagify = new Tagify(input, {
+            whitelist: whitelistTags,
+            focusable: false,
+            dropdown: {
+                position: 'input',
+                maxItems: 10,
+                enabled: 0 // always opens dropdown when input gets focus
+            }
+        });
+
+        const existingTags = hiddenTagField.value;
+        if (existingTags) {
+            tagify.addTags(existingTags.split(",").map(tag => tag.trim()));
+        }
+
+        // 태그 변경 시 hidden 필드 업데이트
+        tagify.on('change', function () {
+            // 배열 값만 설정 (중첩 배열 제거)
+            hiddenTagField.value = tagify.value.map(tag => tag.value).join(",");
+        });
+    });
+</script>
+
+<script type="application/javascript">
+    $(document).ready(function() {
+        var locationInput = document.querySelector('input[name=inputLocations]');
+        var hiddenLocationField = document.querySelector('#locations');
+
+        var whitelistLocations = document.querySelector("#whitelist2").innerText.split(",").map(location => location.trim());
+
+        var locationTagify = new Tagify(locationInput, {
+            whitelist: whitelistLocations,
+            dropdown: {
+                position: 'input',
+                maxItems: 10,
+                enabled: 0,
+            },
+        });
+
+        const existingLocations = hiddenLocationField.value;
+        if (existingLocations) {
+            locationTagify.addTags(existingLocations.split(",").map(loc => loc.trim()));
+        }
+
+        // 태그 변경 시 hidden 필드 업데이트
+        locationTagify.on('change', function () {
+            // 배열 값만 설정 (중첩 배열 제거)
+            hiddenLocationField.value = locationTagify.value.map(location => location.value).join(",");
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tooltip을 수동으로 활성화
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+
+<script type="application/javascript">
+    $(document).ready(function() {
+        $('#summernote').summernote({
+            // tooltip: false,
+            fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Noto Sans KR', 'Merriweather'],
+            placeholder: '스터디의 목표, 일정, 진행 방식, 사용할 교재 또는 인터넷 강좌 그리고 모집중인 스터디원 등 스터디에 대해 자세히 적어 주세요.',
+            tabsize: 2,
+            height: 300
+        })
+    });
+</script>
+
+<link rel="stylesheet" href="/node_modules/summernote/dist/summernote-bs5.min.css">
+<script src="/node_modules/summernote/dist/summernote-bs5.min.js"></script>
 </body>
 </html>
