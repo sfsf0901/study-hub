@@ -76,7 +76,7 @@ public class MainController {
         model.addAttribute("totalElements", studies.getTotalElements());
         model.addAttribute("searchConditions", searchConditions);
 
-        model.addAttribute("banner", "https://snackball-static-files.s3.ap-northeast-2.amazonaws.com/banner.png");
+        model.addAttribute("banner", "https://snackball-static-files.s3.ap-northeast-2.amazonaws.com/banner_v2.png");
 
         return "index";
     }
