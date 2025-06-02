@@ -1,5 +1,10 @@
 ![Image](https://github.com/user-attachments/assets/23eca6ef-ab6b-4574-8669-b0f866396497)
 
+- 배포 URL : https://skaa.p-e.kr/
+- Test ID : test@test.com
+- Test PW : test1234
+
+
 ## 프로젝트 소개
 '스카'는 스터디 개설자와 참여자가 자유롭게 소통하며 함께 성장할 수 있는 스터디 매칭 서비스입니다.
 
